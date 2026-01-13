@@ -44,7 +44,7 @@ const INITIAL_FORM_STATE = {
   layoutMode: 'list', // 'list', 'compact', 'visual', etc.
 
   // Webhook
-  webhookUrl: ''
+  webhookUrl: localStorage.getItem('webhookUrl') || ''
 };
 
 const generateProtocol = () => {
@@ -117,6 +117,11 @@ function App() {
       customMessage: template.text
     }));
   }, [formData.selectedTemplateId, formData.messageType]);
+
+  // Persist Webhook URL
+  useEffect(() => {
+    localStorage.setItem('webhookUrl', formData.webhookUrl);
+  }, [formData.webhookUrl]);
 
   const handleChange = (field, value) => {
     setFormData(prev => ({
