@@ -65,12 +65,11 @@ const DashboardForm = ({ formData, onChange }) => {
             console.log('Final Processed Message:', processedMessage);
 
             // 5. Construct Payload
+            // STRICT API Structure: { number, type, text, choices?, footerText? }
             const payload = {
-                ...formData, // Keep raw data
-                customMessage: processedMessage, // Overwrite with interpolated version
                 number: cleanPhone,
-                text: processedMessage, // The fully interpolated message
                 type: formData.linkFormat === 'button' ? 'button' : 'text',
+                text: processedMessage,
 
                 // Fields for button structure
                 ...(formData.linkFormat === 'button' && {
@@ -81,9 +80,7 @@ const DashboardForm = ({ formData, onChange }) => {
                         }
                     ],
                     footerText: 'AScell',
-                }),
-
-                finalLink: finalLink
+                })
             };
 
             console.log('Sending Webhook Payload:', JSON.stringify(payload, null, 2));
