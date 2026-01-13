@@ -6,7 +6,7 @@ const UsersPage = () => {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isAdding, setIsAdding] = useState(false);
-    const [newUser, setNewUser] = useState({ name: '', email: '', role: 'Operador' });
+    const [newUser, setNewUser] = useState({ name: '', email: '', password: '', role: 'Operador' });
 
     const fetchUsers = async () => {
         setLoading(true);
@@ -31,17 +31,18 @@ const UsersPage = () => {
     const handleAddUser = async (e) => {
         e.preventDefault();
         try {
-            if (!newUser.name || !newUser.email) return;
+            if (!newUser.name || !newUser.email || !newUser.password) return;
 
             await api.createUser({
                 name: newUser.name,
                 email: newUser.email,
+                password: newUser.password,
                 role: newUser.role
             });
 
             await fetchUsers();
             setIsAdding(false);
-            setNewUser({ name: '', email: '', role: 'Operador' });
+            setNewUser({ name: '', email: '', password: '', role: 'Operador' });
         } catch (error) {
             console.error(error);
             alert('Erro ao criar usuário');
@@ -108,6 +109,17 @@ const UsersPage = () => {
                                 placeholder="usuario@email.com"
                                 value={newUser.email}
                                 onChange={e => setNewUser({ ...newUser, email: e.target.value })}
+                            />
+                        </div>
+                        <div className="space-y-1.5">
+                            <label className="text-xs font-medium text-gray-700">Senha</label>
+                            <input
+                                type="password"
+                                required
+                                className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 outline-none"
+                                placeholder="••••••••"
+                                value={newUser.password}
+                                onChange={e => setNewUser({ ...newUser, password: e.target.value })}
                             />
                         </div>
                         <div className="flex gap-2">
