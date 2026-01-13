@@ -54,12 +54,24 @@ function App() {
   const [currentUser, setCurrentUser] = useState(null);
 
   // Initial Auth Check
+  // Initial Auth Check
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const user = localStorage.getItem('user');
-    if (token && user) {
-      setIsAuthenticated(true);
-      setCurrentUser(JSON.parse(user));
+    try {
+      const token = localStorage.getItem('token');
+      const userStr = localStorage.getItem('user');
+
+      if (token && userStr) {
+        const user = JSON.parse(userStr);
+        setIsAuthenticated(true);
+        setCurrentUser(user);
+      }
+    } catch (error) {
+      console.error("Erro ao recuperar sessão:", error);
+      // Se falhar ao ler (ex: JSON inválido), limpa tudo para evitar loop de erro
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      setIsAuthenticated(false);
+      setCurrentUser(null);
     }
   }, []);
 
