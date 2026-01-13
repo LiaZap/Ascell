@@ -343,7 +343,7 @@ const DashboardForm = ({ formData, onChange }) => {
                         </div>
 
                         {/* Custom Message Editor */}
-                        <div className="space-y-1.5 col-span-full">
+                        <div className={`space-y-1.5 col-span-full transition-opacity duration-200 ${formData.isRandomTemplate ? 'opacity-50 pointer-events-none grayscale' : ''}`}>
                             <label className="block text-sm font-medium text-gray-700">Editar Mensagem</label>
                             <textarea
                                 className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none text-sm font-sans min-h-[120px]"
