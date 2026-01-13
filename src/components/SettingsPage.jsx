@@ -1,4 +1,5 @@
 import { Save } from 'lucide-react';
+import { api } from '../services/api';
 
 const SettingsPage = ({ formData, onChange }) => {
     return (
@@ -36,7 +37,16 @@ const SettingsPage = ({ formData, onChange }) => {
                     <div className="pt-4 flex justify-end">
                         <button
                             className="flex items-center gap-2 px-6 py-2.5 bg-primary text-white font-medium rounded-lg shadow-lg shadow-primary/20 hover:bg-primary-dark transition-all active:translate-y-0.5"
-                            onClick={() => alert('Configurações salvas com sucesso!')}
+                            onClick={async () => {
+                                try {
+                                    await api.updateSettings({ webhookUrl: formData.webhookUrl });
+                                    // Update local storage as well just in case
+                                    localStorage.setItem('webhookUrl', formData.webhookUrl);
+                                    alert('Configurações salvas com sucesso! (Global)');
+                                } catch (error) {
+                                    alert('Erro ao salvar configurações: ' + error.message);
+                                }
+                            }}
                         >
                             <Save size={18} />
                             Salvar Alterações

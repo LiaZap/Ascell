@@ -70,5 +70,32 @@ export const api = {
             console.error('API Error:', error);
             throw error;
         }
+    },
+
+    // Settings
+    getSettings: async () => {
+        try {
+            const response = await fetch(`${API_URL}/settings`);
+            if (!response.ok) throw new Error('Failed to fetch settings');
+            return await response.json();
+        } catch (error) {
+            console.error('API Error:', error);
+            return { webhookUrl: '' }; // Fallback
+        }
+    },
+
+    updateSettings: async (settings) => {
+        try {
+            const response = await fetch(`${API_URL}/settings`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(settings)
+            });
+            if (!response.ok) throw new Error('Failed to update settings');
+            return await response.json();
+        } catch (error) {
+            console.error('API Error:', error);
+            throw error;
+        }
     }
 };

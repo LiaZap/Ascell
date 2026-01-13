@@ -117,6 +117,11 @@ app.get('/api/setup', async (req, res) => {
                 last_login TIMESTAMP,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
+
+            CREATE TABLE IF NOT EXISTS settings (
+                key VARCHAR(50) PRIMARY KEY,
+                value TEXT
+            );
         `);
         res.send('Tabelas Criadas com Sucesso! Agora você pode usar o sistema.');
     } catch (err) {
@@ -245,6 +250,36 @@ app.delete('/api/users/:id', async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: 'Failed to delete user' });
+    }
+});
+
+// 7. Get Settings
+app.get('/api/settings', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT value FROM settings WHERE key = $1', ['webhookUrl']);
+        if (result.rows.length > 0) {
+            res.json({ webhookUrl: result.rows[0].value });
+        } else {
+            res.json({ webhookUrl: '' });
+        }
+    } catch (err) {
+        console.error('Error fetching settings:', err);
+        res.status(500).json({ error: 'Failed to fetch settings' });
+    }
+});
+
+// 8. Update Settings
+app.put('/api/settings', async (req, res) => {
+    const { webhookUrl } = req.body;
+    try {
+        await pool.query(
+            'INSERT INTO settings (key, value) VALUES ($1, $2) ON CONFLICT (key) DO UPDATE SET value = $2',
+            ['webhookUrl', webhookUrl]
+        );
+        res.json({ message: 'Settings updated successfully' });
+    } catch (err) {
+        console.error('Error updating settings:', err);
+        res.status(500).json({ error: 'Failed to update settings' });
     }
 });
 

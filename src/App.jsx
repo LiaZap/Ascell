@@ -86,6 +86,24 @@ function App() {
     }
   }, []);
 
+  // Fetch Global Settings on Auth
+  useEffect(() => {
+    if (isAuthenticated) {
+      const loadSettings = async () => {
+        try {
+          const settings = await api.getSettings();
+          if (settings.webhookUrl) {
+            setFormData(prev => ({ ...prev, webhookUrl: settings.webhookUrl }));
+            localStorage.setItem('webhookUrl', settings.webhookUrl); // Sync local
+          }
+        } catch (err) {
+          console.error('Failed to load global settings', err);
+        }
+      };
+      loadSettings();
+    }
+  }, [isAuthenticated]);
+
   const handleLogin = (user, token) => {
     localStorage.setItem('token', token);
     localStorage.setItem('user', JSON.stringify(user));
