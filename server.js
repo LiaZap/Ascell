@@ -63,6 +63,19 @@ const initDb = async () => {
             END $$;
         `);
 
+        // Create Default Admin if no users exist
+        const userCountResult = await pool.query('SELECT COUNT(*) FROM users');
+        const userCount = parseInt(userCountResult.rows[0].count);
+
+        if (userCount === 0) {
+            const hashedPassword = await bcrypt.hash('admin123', 10);
+            await pool.query(
+                `INSERT INTO users (name, email, password, role, status) VALUES ($1, $2, $3, $4, $5)`,
+                ['Administrador', 'admin@ascel.com', hashedPassword, 'Administrador', 'Ativo']
+            );
+            console.log('Default admin user created: admin@ascel.com / admin123');
+        }
+
         console.log('Database tables verified/created successfully.');
     } catch (err) {
         console.error('Failed to initialize database:', err);
