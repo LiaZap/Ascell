@@ -357,15 +357,7 @@ const DashboardForm = ({ formData, onChange }) => {
                         </div>
 
                         {/* Destination Field Removed as per user request (Fixed to Private) */}
-                        <div className="space-y-1.5">
-                            <label className="block text-sm font-medium text-gray-700">Agendar Data</label>
-                            <input
-                                type="date"
-                                className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none text-sm"
-                                value={formData.scheduleDate}
-                                onChange={(e) => onChange('scheduleDate', e.target.value)}
-                            />
-                        </div>
+                        {/* Date Scheduler Removed */}
                     </div>
                 </section>
 
