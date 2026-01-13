@@ -65,11 +65,20 @@ const DashboardForm = ({ formData, onChange }) => {
             console.log('Final Processed Message:', processedMessage);
 
             // 5. Construct Payload
-            // STRICT API Structure: { number, type, text, choices?, footerText? }
+            // STRICT API Structure + Metadata for Logic
             const payload = {
+                // Core Message Fields
                 number: cleanPhone,
                 type: formData.linkFormat === 'button' ? 'button' : 'text',
                 text: processedMessage,
+
+                // Metadata (Restored for Flow Logic)
+                clientName: formData.clientName,
+                clientPhone: cleanPhone,
+                linkFormat: formData.linkFormat || 'text',
+                customMessage: processedMessage, // Ensure this matches text
+                protocolCode: formData.protocolCode,
+                messageType: formData.messageType,
 
                 // Fields for button structure
                 ...(formData.linkFormat === 'button' && {
