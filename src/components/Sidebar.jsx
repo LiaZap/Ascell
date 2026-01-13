@@ -2,12 +2,16 @@ import { LayoutDashboard, FileText, Users, LogOut, Settings } from 'lucide-react
 
 const Sidebar = ({ activeView, onViewChange, onLogout, user }) => {
 
-    const menuItems = [
-        { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-        { id: 'logs', label: 'Logs de Disparo', icon: FileText },
-        { id: 'users', label: 'Gestão de Usuários', icon: Users },
-        { id: 'settings', label: 'Configurações', icon: Settings },
+    const allMenuItems = [
+        { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, roles: ['Operador', 'Administrador'] },
+        { id: 'logs', label: 'Logs de Disparo', icon: FileText, roles: ['Administrador'] },
+        { id: 'users', label: 'Gestão de Usuários', icon: Users, roles: ['Administrador'] },
+        { id: 'settings', label: 'Configurações', icon: Settings, roles: ['Administrador'] },
     ];
+
+    const menuItems = allMenuItems.filter(item =>
+        item.roles.includes(user?.role || 'Operador')
+    );
 
     return (
         <aside className="w-64 bg-[#1e4d85] text-white flex flex-col h-screen fixed left-0 top-0 shadow-xl z-50">

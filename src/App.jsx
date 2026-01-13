@@ -93,12 +93,19 @@ function App() {
     setCurrentUser(null);
   };
 
+  // Generate an initial protocol code or defaults if needed
   useEffect(() => {
-    // Generate an initial protocol code or defaults if needed
     if (!formData.protocolCode) {
       setFormData(prev => ({ ...prev, protocolCode: generateProtocol() }));
     }
   }, []);
+
+  // Access Control: Redirect Operador to Dashboard if they try to access other views
+  useEffect(() => {
+    if (currentUser?.role === 'Operador' && activeView !== 'dashboard') {
+      setActiveView('dashboard');
+    }
+  }, [currentUser, activeView]);
 
   // Update customMessage when template changes
   useEffect(() => {
