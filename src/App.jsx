@@ -77,10 +77,6 @@ function App() {
     setCurrentUser(null);
   };
 
-  if (!isAuthenticated) {
-    return <LoginPage onLogin={handleLogin} />;
-  }
-
   useEffect(() => {
     // Generate an initial protocol code or defaults if needed
     if (!formData.protocolCode) {
@@ -105,6 +101,13 @@ function App() {
       [field]: value
     }));
   };
+
+  // ------------------------------------------------------------------
+  // Auth Check - Must be AFTER all hooks
+  // ------------------------------------------------------------------
+  if (!isAuthenticated) {
+    return <LoginPage onLogin={handleLogin} />;
+  }
 
   const generateProtocol = () => {
     return 'ASC-' + Math.floor(1000 + Math.random() * 9000);
