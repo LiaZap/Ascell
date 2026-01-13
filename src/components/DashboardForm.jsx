@@ -62,8 +62,9 @@ const DashboardForm = ({ formData, onChange }) => {
             // 5. Construct Payload
             const payload = {
                 ...formData, // Keep raw data
+                customMessage: processedMessage, // Overwrite with interpolated version
                 number: cleanPhone,
-                text: processedMessage, // Interpolated message
+                text: processedMessage, // The fully interpolated message
                 type: formData.linkFormat === 'button' ? 'button' : 'text',
 
                 // Fields for button structure
