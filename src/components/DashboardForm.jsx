@@ -1,8 +1,8 @@
-import { Calendar, Clock, Link as LinkIcon, User, Settings, HelpCircle, FileText, CheckCircle, Video, Shield } from 'lucide-react';
-import { MEETING_TEMPLATES, CERTIFICATE_TEMPLATES } from '../data/templates';
-import { useEffect } from 'react';
+import { Calendar, Clock, Link as LinkIcon, User, Settings, HelpCircle, FileText, CheckCircle, Video, Shield, Loader2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 const DashboardForm = ({ formData, onChange }) => {
+    const [isSending, setIsSending] = useState(false);
 
     // Update available templates based on type
     const currentTemplates = formData.messageType === 'meeting' ? MEETING_TEMPLATES : CERTIFICATE_TEMPLATES;
@@ -16,27 +16,48 @@ const DashboardForm = ({ formData, onChange }) => {
         }
     }, [formData.messageType]);
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
+        if (!formData.webhookUrl) {
+            alert('Por favor, configure a URL do Webhook na aba Configurações.');
+            return;
+        }
+
+        setIsSending(true);
         let finalPayload = { ...formData };
 
-        // Random Selection Logic
+        // Random Selection Logic if enabled
         if (formData.isRandomTemplate) {
             const randomIndex = Math.floor(Math.random() * currentTemplates.length);
             const randomTemplate = currentTemplates[randomIndex];
             finalPayload.selectedTemplateId = randomTemplate.id;
-            // Also update custom message if it was relying on template defaults (though usually customMessage is set on change)
-            // Ideally we'd send the ID and let the backend/processor handle it, but here we simulate the "send".
-            console.log(`[Anti-Spam] Selected Random Template: ${randomTemplate.id} (${randomTemplate.name})`);
-            alert(`[Anti-Spam] Enviando modelo aleatório: ${randomTemplate.name}`);
-        } else {
-            console.log('Sending Payload:', JSON.stringify(formData, null, 2));
-            if (formData.webhookUrl) {
-                alert(`Dados enviados para: ${formData.webhookUrl}`);
+            finalPayload.customMessage = randomTemplate.text; // Ensure message matches template
+            console.log(`[Anti-Spam] Selected Random Template: ${randomTemplate.id}`);
+        }
+
+        try {
+            console.log('Sending Payload:', JSON.stringify(finalPayload, null, 2));
+
+            const response = await fetch(formData.webhookUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(finalPayload),
+            });
+
+            if (response.ok) {
+                alert('Sucesso! Dados enviados para o agente.');
             } else {
-                alert('Configure a URL do Webhook para enviar.');
+                const errorText = await response.text();
+                throw new Error(`Erro ${response.status}: ${errorText}`);
             }
+        } catch (error) {
+            console.error('Webhook Error:', error);
+            alert(`Falha ao enviar: ${error.message}`);
+        } finally {
+            setIsSending(false);
         }
     };
 
@@ -309,9 +330,22 @@ const DashboardForm = ({ formData, onChange }) => {
                     </div>
                 )}
 
-                <button type="submit" className="w-full py-4 bg-primary text-white font-bold rounded-lg shadow-lg hover:bg-primary-dark hover:shadow-xl hover:-translate-y-0.5 transform transition-all flex items-center justify-center gap-2 group text-sm uppercase tracking-wide">
-                    <span>{formData.messageType === 'meeting' ? 'Agendar Lembrete' : 'Agendar Envio de Certificado'}</span>
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" className="transform group-hover:translate-x-1 transition-transform"><path d="M3.33334 8H12.6667M12.6667 8L8.00001 3.33333M12.6667 8L8.00001 12.6667" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                <button
+                    type="submit"
+                    disabled={isSending}
+                    className="w-full py-4 bg-primary text-white font-bold rounded-lg shadow-lg hover:bg-primary-dark hover:shadow-xl hover:-translate-y-0.5 transform transition-all flex items-center justify-center gap-2 group text-sm uppercase tracking-wide disabled:opacity-70 disabled:cursor-not-allowed"
+                >
+                    {isSending ? (
+                        <>
+                            <Loader2 size={20} className="animate-spin" />
+                            <span>Enviando...</span>
+                        </>
+                    ) : (
+                        <>
+                            <span>{formData.messageType === 'meeting' ? 'Agendar Lembrete' : 'Agendar Envio de Certificado'}</span>
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" className="transform group-hover:translate-x-1 transition-transform"><path d="M3.33334 8H12.6667M12.6667 8L8.00001 3.33333M12.6667 8L8.00001 12.6667" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                        </>
+                    )}
                 </button>
 
             </form>
