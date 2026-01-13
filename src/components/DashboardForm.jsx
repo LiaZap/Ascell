@@ -107,6 +107,21 @@ const DashboardForm = ({ formData, onChange }) => {
 
             if (response.ok) {
                 showToast('Dados enviados com sucesso!', 'success');
+
+                // Save Log to LocalStorage for Sync
+                const newLog = {
+                    id: Date.now(),
+                    protocol: formData.protocolCode,
+                    date: new Date().toLocaleString('pt-BR'),
+                    agent: formData.agentName || 'Sistema',
+                    client: formData.clientName || 'Cliente',
+                    type: formData.messageType === 'meeting' ? 'Lembrete' : 'Certificado',
+                    status: 'Enviado'
+                };
+
+                const existingLogs = JSON.parse(localStorage.getItem('app_logs') || '[]');
+                localStorage.setItem('app_logs', JSON.stringify([newLog, ...existingLogs]));
+
             } else {
                 const errorText = await response.text();
                 throw new Error(`Erro ${response.status}: ${errorText}`);

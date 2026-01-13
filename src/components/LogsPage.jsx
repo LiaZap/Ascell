@@ -17,12 +17,18 @@ const LogsPage = () => {
                 if (data && data.length > 0) {
                     setLogs(data);
                 } else {
-                    // Fallback Mock for Dev Preview ease (Optional, remove in strict prod)
-                    setLogs([
-                        { id: 1, date: '13/01/2026 10:45', agent: 'Maria Silva', client: 'João Souza', type: 'Lembrete', status: 'Enviado', protocol: 'ASC-8821' },
-                        { id: 2, date: '13/01/2026 10:30', agent: 'Carlos Oliveira', client: 'Ana Paula', type: 'Certificado', status: 'Enviado', protocol: 'ASC-8820' },
-                        { id: 3, date: '13/01/2026 09:15', agent: 'Maria Silva', client: 'Pedro Santos', type: 'Lembrete', status: 'Falha', protocol: 'ASC-8819' },
-                    ]);
+                    // Sync with LocalStorage Logs (Created by DashboardForm)
+                    const localLogs = JSON.parse(localStorage.getItem('app_logs') || '[]');
+
+                    if (localLogs.length > 0) {
+                        setLogs(localLogs);
+                    } else {
+                        // Fallback Mock only if empty
+                        setLogs([
+                            { id: 1, date: '13/01/2026 10:45', agent: 'Maria Silva', client: 'João Souza', type: 'Lembrete', status: 'Enviado', protocol: 'ASC-8821' },
+                            { id: 2, date: '13/01/2026 10:30', agent: 'Carlos Oliveira', client: 'Ana Paula', type: 'Certificado', status: 'Enviado', protocol: 'ASC-8820' },
+                        ]);
+                    }
                 }
             } catch (error) {
                 console.error("Failed to load logs", error);
