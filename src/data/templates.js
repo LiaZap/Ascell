@@ -2,7 +2,7 @@ export const MEETING_TEMPLATES = [
     {
         id: 'v1',
         name: 'Versão 1 – Padrão',
-        text: `Olá *{{clientName}}*, sou do time de Videoconferência do Grupo ASCEL.
+        text: `Olá *{{clientName}}*, me chamo *{{agentName}}* e sou do time de Videoconferência do Grupo ASCEL.
 📅 *Atendimento agendado*
 Hoje às {{time}} (horário de Brasília)
 🔗 *Acesso à reunião*
@@ -17,7 +17,7 @@ Clique no link, selecione “prosseguir” e informe o código enviado por SMS e
     {
         id: 'v2',
         name: 'Versão 2 – Lista Numerada',
-        text: `Olá *{{clientName}}*, sou da equipe de Videoconferência do Grupo ASCEL 😊
+        text: `Olá *{{clientName}}*, aqui é *{{agentName}}* da equipe de Videoconferência do Grupo ASCEL 😊
 1️⃣ Atendimento marcado para hoje às {{time}} (horário de Brasília)
 2️⃣ Para acessar a reunião:
 {{link}}
@@ -31,7 +31,7 @@ Podemos confirmar sua presença?`
     {
         id: 'v3',
         name: 'Versão 3 – Compacto',
-        text: `Olá *{{clientName}}*, aqui é da Videoconferência do Grupo ASCEL.
+        text: `Olá *{{clientName}}*, me chamo *{{agentName}}* da Videoconferência do Grupo ASCEL.
 📅 Atendimento: hoje às {{time}} (horário de Brasília)
 🔗 Link de acesso:
 {{link}}
@@ -40,12 +40,12 @@ Podemos confirmar sua presença?`
 • Local silencioso
 • Fundo claro obrigatório
 • Tolerância de atraso: 8 minutos
-43: Confirma nosso atendimento?`
+Confirma nosso atendimento?`
     },
     {
         id: 'v4',
         name: 'Versão 4 – Separadores',
-        text: `Olá *{{clientName}}*, sou da equipe de Videoconferência do Grupo ASCEL.
+        text: `Olá *{{clientName}}*, aqui é *{{agentName}}* da equipe de Videoconferência do Grupo ASCEL.
 ────────────
 📅 *Horário do atendimento*
 Hoje às {{time}} (horário de Brasília)
@@ -62,7 +62,7 @@ Podemos confirmar?`
     {
         id: 'v5',
         name: 'Versão 5 – Pergunta e Resposta',
-        text: `Olá *{{clientName}}*, serei responsável por realizar a sua Videoconferência.
+        text: `Olá *{{clientName}}*, sou *{{agentName}}* e serei responsável por realizar a sua Videoconferência.
 
 ❓ *Quando é o atendimento?*
 📅 Hoje às {{time}} (horário de Brasília)
@@ -78,7 +78,7 @@ Podemos confirmar o atendimento?`
     {
         id: 'v6',
         name: 'Versão 6 – Visual (com Nome)',
-        text: `Olá *{{clientName}}*, sou {{agentName}} agente de vídeo conferência responsável pelo seu atendimento.
+        text: `Olá *{{clientName}}*, sou *{{agentName}}* agente de vídeo conferência responsável pelo seu atendimento.
 📞 *Videoconferência | Grupo ASCEL*
 🕒 Hoje às {{time}} (horário de Brasília)
 🔗 *Acesso*
@@ -94,7 +94,7 @@ Confirma o atendimento?`
     {
         id: 'v7',
         name: 'Versão 7 – Direto',
-        text: `Olá *{{clientName}}*, meu nome é {{agentName}}, sou da equipe de Videoconferência do Grupo ASCEL.
+        text: `Olá *{{clientName}}*, meu nome é *{{agentName}}*, sou da equipe de Videoconferência do Grupo ASCEL.
 📅 Atendimento agendado para hoje às {{time}} (horário de Brasília).
 🔗 Acesse pelo link:
 {{link}}
@@ -108,7 +108,7 @@ Podemos confirmar?`
     {
         id: 'v8',
         name: 'Versão 8 – Destaque',
-        text: `Olá *{{clientName}}*, sou da equipe de Videoconferência do Grupo ASCEL.
+        text: `Olá *{{clientName}}*, aqui é *{{agentName}}* da equipe de Videoconferência do Grupo ASCEL.
 ⭐ *Atendimento de hoje*
 🕒 {{time}} (horário de Brasília)
 🔗 *Link da reunião*
@@ -136,7 +136,7 @@ Este certificado só pode ser baixado e instalado no computador.
 📄 Protocolo:
 {{protocol}}
 Agradecemos a confiança 🚀
-Estamos sempre à disposição!`
+*{{agentName}}* - Grupo ASCEL`
     },
     {
         id: 'c2',
@@ -150,7 +150,7 @@ O download/instalação deve ser feito somente no computador.
 ➡️ Protocolo:
 {{protocol}}
 Obrigado pela confiança 🚀
-Conte sempre conosco!`
+Att, *{{agentName}}*`
     },
     {
         id: 'c3',
@@ -163,7 +163,7 @@ O certificado pode ser baixado e instalado apenas no computador.
 📌 Protocolo:
 {{protocol}}
 Agradecemos a confiança 🚀
-Estamos à disposição para ajudar!`
+*{{agentName}}* | Suporte`
     },
     {
         id: 'c4',
@@ -178,7 +178,7 @@ Olá *{{clientName}}*,
 📄 Protocolo:
 {{protocol}}
 Obrigado por confiar em nosso serviço 🚀
-Seguimos à disposição!`
+Atenciosamente, *{{agentName}}*`
     },
     {
         id: 'c5',
@@ -191,7 +191,7 @@ Seguimos à disposição!`
 🔗 {{link}}
 📄 Protocolo: {{protocol}}
 Agradecemos a confiança 🚀
-Estamos sempre à disposição!`
+*{{agentName}}*`
     },
     {
         id: 'c6',
@@ -205,7 +205,7 @@ A emissão e instalação são permitidas somente em computador.
 📌 Protocolo:
 {{protocol}}
 Obrigado pela confiança 🚀
-Conte conosco sempre!`
+Att, *{{agentName}}*`
     },
     {
         id: 'c7',
@@ -220,7 +220,7 @@ O certificado só pode ser baixado/instalado no computador.
 📄 Protocolo:
 {{protocol}}
 Agradecemos a confiança 🚀
-Estamos à disposição!`
+Com carinho, *{{agentName}}*`
     },
     {
         id: 'c8',
@@ -234,6 +234,6 @@ A emissão é válida apenas pelo computador.
 📌 Protocolo:
 {{protocol}}
 Obrigado pela confiança 🚀
-Estamos sempre prontos para ajudar!`
+*{{agentName}}* - Atendimento`
     }
 ];
