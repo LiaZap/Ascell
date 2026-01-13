@@ -7,6 +7,8 @@ import Sidebar from './components/Sidebar';
 import LogsPage from './components/LogsPage';
 import UsersPage from './components/UsersPage';
 import SettingsPage from './components/SettingsPage';
+import LoginPage from './components/LoginPage';
+import { Shield } from 'lucide-react';
 import { MEETING_TEMPLATES, CERTIFICATE_TEMPLATES } from './data/templates';
 
 const INITIAL_FORM_STATE = {
@@ -48,6 +50,36 @@ const INITIAL_FORM_STATE = {
 function App() {
   const [activeView, setActiveView] = useState('dashboard');
   const [formData, setFormData] = useState(INITIAL_FORM_STATE);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
+
+  // Initial Auth Check
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const user = localStorage.getItem('user');
+    if (token && user) {
+      setIsAuthenticated(true);
+      setCurrentUser(JSON.parse(user));
+    }
+  }, []);
+
+  const handleLogin = (user, token) => {
+    localStorage.setItem('token', token);
+    localStorage.setItem('user', JSON.stringify(user));
+    setIsAuthenticated(true);
+    setCurrentUser(user);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setIsAuthenticated(false);
+    setCurrentUser(null);
+  };
+
+  if (!isAuthenticated) {
+    return <LoginPage onLogin={handleLogin} />;
+  }
 
   useEffect(() => {
     // Generate an initial protocol code or defaults if needed
@@ -80,7 +112,12 @@ function App() {
 
   return (
     <div className="min-h-screen bg-[var(--color-bg-page)] text-[var(--color-text-main)] font-sans flex">
-      <Sidebar activeView={activeView} onViewChange={setActiveView} />
+      <Sidebar
+        activeView={activeView}
+        onViewChange={setActiveView}
+        onLogout={handleLogout}
+        user={currentUser}
+      />
 
       <div className="flex-1 ml-64 transition-all duration-300">
         {/* Dynamic Content Area */}
@@ -90,11 +127,18 @@ function App() {
               <div className="container mx-auto max-w-7xl h-16 flex items-center justify-between px-6 lg:px-8">
                 <div className="flex items-center gap-4">
                   <div className="w-10 h-10 bg-[var(--color-primary)] rounded-xl shadow-lg shadow-[var(--color-primary)]/20 flex items-center justify-center text-white transform hover:scale-105 transition-transform duration-200">
-                    <Layout size={24} />
+                    <Shield size={24} />
                   </div>
                   <div>
-                    <h1 className="text-xl font-bold tracking-tight text-[var(--color-text-main)]">Agente de Lembretes</h1>
-                    <p className="text-sm text-[var(--color-text-secondary)] font-medium">Dashboard Administrativo</p>
+                    <h1 className="text-xl font-bold tracking-tight text-[var(--color-text-main)]">AScell Supervisor</h1>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-100">
+                        v2.0.0
+                      </span>
+                      <span className="text-xs text-slate-500">
+                        | Olá, <b>{currentUser?.name || 'Admin'}</b>
+                      </span>
+                    </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">

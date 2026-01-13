@@ -1,10 +1,29 @@
 const API_URL = import.meta.env.PROD ? '/api' : '/api'; // Relative path works for both if proxied or served static
 
 export const api = {
+    // Auth
+    login: async (email, password) => {
+        try {
+            const response = await fetch(`${API_URL}/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+            if (!response.ok) throw new Error('Login failed');
+            return await response.json();
+        } catch (error) {
+            console.error('API Error:', error);
+            throw error;
+        }
+    },
+
     // Logs
     getLogs: async () => {
         try {
-            const response = await fetch(`${API_URL}/logs`);
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${API_URL}/logs`, {
+                headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+            });
             if (!response.ok) throw new Error('Failed to fetch logs');
             return await response.json();
         } catch (error) {

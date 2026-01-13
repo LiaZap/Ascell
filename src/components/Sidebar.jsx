@@ -1,6 +1,6 @@
 import { LayoutDashboard, FileText, Users, LogOut, Settings } from 'lucide-react';
 
-const Sidebar = ({ activeView, onViewChange }) => {
+const Sidebar = ({ activeView, onViewChange, onLogout, user }) => {
 
     const menuItems = [
         { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -41,15 +41,15 @@ const Sidebar = ({ activeView, onViewChange }) => {
 
             {/* Footer / User Profile */}
             <div className="p-4 border-t border-white/10">
-                <div className="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-white/5 cursor-pointer transition-colors">
+                <div className="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-white/5 cursor-pointer transition-colors group" onClick={onLogout}>
                     <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center border border-blue-400/30">
-                        <span className="text-xs font-bold">PA</span>
+                        <span className="text-xs font-bold">{user?.name?.substring(0, 2).toUpperCase() || 'AD'}</span>
                     </div>
                     <div className="flex-1 overflow-hidden">
-                        <p className="text-xs font-medium truncate">Paulo Admin</p>
-                        <p className="text-[10px] text-blue-200 truncate">paulo@ascel.com</p>
+                        <p className="text-xs font-medium truncate">{user?.name || 'Administrador'}</p>
+                        <p className="text-[10px] text-blue-200 truncate">{user?.email || 'admin@ascel.com'}</p>
                     </div>
-                    <LogOut size={14} className="text-blue-300 hover:text-white" />
+                    <LogOut size={14} className="text-blue-300 group-hover:text-red-400 transition-colors" />
                 </div>
             </div>
         </aside>
