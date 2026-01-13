@@ -53,7 +53,14 @@ const generateProtocol = () => {
 
 function App() {
   const [activeView, setActiveView] = useState('dashboard');
-  const [formData, setFormData] = useState(INITIAL_FORM_STATE);
+  const [formData, setFormData] = useState(() => {
+    // Lazy init to ensure localStorage is read at mount time, avoiding module caching issues
+    const savedUrl = localStorage.getItem('webhookUrl') || '';
+    return {
+      ...INITIAL_FORM_STATE,
+      webhookUrl: savedUrl
+    };
+  });
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
 

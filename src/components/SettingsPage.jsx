@@ -34,7 +34,10 @@ const SettingsPage = ({ formData, onChange }) => {
                     </div>
 
                     <div className="pt-4 flex justify-end">
-                        <button className="flex items-center gap-2 px-6 py-2.5 bg-primary text-white font-medium rounded-lg shadow-lg shadow-primary/20 hover:bg-primary-dark transition-all active:translate-y-0.5">
+                        <button
+                            className="flex items-center gap-2 px-6 py-2.5 bg-primary text-white font-medium rounded-lg shadow-lg shadow-primary/20 hover:bg-primary-dark transition-all active:translate-y-0.5"
+                            onClick={() => alert('Configurações salvas com sucesso!')}
+                        >
                             <Save size={18} />
                             Salvar Alterações
                         </button>
