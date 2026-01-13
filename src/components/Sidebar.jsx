@@ -21,7 +21,7 @@ const Sidebar = ({ activeView, onViewChange, onLogout, user }) => {
                     <LayoutDashboard size={18} className="text-white" />
                 </div>
                 <div>
-                    <h1 className="font-bold text-sm tracking-wide">AScel Supervisor</h1>
+                    <h1 className="font-bold text-sm tracking-wide">ASCEL Supervisor</h1>
                     <p className="text-[10px] text-blue-200 opacity-80">Admin Console</p>
                 </div>
             </div>

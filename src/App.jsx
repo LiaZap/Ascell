@@ -184,7 +184,7 @@ function App() {
                     <Shield size={24} />
                   </div>
                   <div>
-                    <h1 className="text-xl font-bold tracking-tight text-[var(--color-text-main)]">AScel Supervisor</h1>
+                    <h1 className="text-xl font-bold tracking-tight text-[var(--color-text-main)]">ASCEL Supervisor</h1>
                     <div className="flex items-center gap-2">
                       <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-100">
                         v2.0.0
