@@ -1,9 +1,15 @@
-import { Calendar, Clock, Link as LinkIcon, User, Settings, HelpCircle, FileText, CheckCircle, Video, Shield, Loader2 } from 'lucide-react';
+import { Calendar, Clock, Link as LinkIcon, User, Settings, HelpCircle, FileText, CheckCircle, Video, Shield, Loader2, AlertCircle, XCircle } from 'lucide-react';
 import { MEETING_TEMPLATES, CERTIFICATE_TEMPLATES } from '../data/templates';
 import { useState, useEffect } from 'react';
 
 const DashboardForm = ({ formData, onChange }) => {
     const [isSending, setIsSending] = useState(false);
+    const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
+
+    const showToast = (message, type = 'success') => {
+        setToast({ show: true, message, type });
+        setTimeout(() => setToast({ show: false, message: '', type: 'success' }), 3000);
+    };
 
     // Update available templates based on type
     const currentTemplates = formData.messageType === 'meeting' ? MEETING_TEMPLATES : CERTIFICATE_TEMPLATES;
@@ -100,14 +106,14 @@ const DashboardForm = ({ formData, onChange }) => {
             });
 
             if (response.ok) {
-                alert('Sucesso! Dados enviados para o agente.');
+                showToast('Dados enviados com sucesso!', 'success');
             } else {
                 const errorText = await response.text();
                 throw new Error(`Erro ${response.status}: ${errorText}`);
             }
         } catch (error) {
             console.error('Webhook Error:', error);
-            alert(`Falha ao enviar: ${error.message}`);
+            showToast(`Falha ao enviar: ${error.message}`, 'error');
         } finally {
             setIsSending(false);
         }
@@ -401,6 +407,32 @@ const DashboardForm = ({ formData, onChange }) => {
                 </button>
 
             </form>
+
+            {/* Toast Notification */}
+            {toast.show && (
+                <div className={`fixed top-4 right-4 z-[9999] flex items-center gap-3 px-6 py-4 rounded-xl shadow-2xl transform transition-all animate-in slide-in-from-right duration-300 ${toast.type === 'success'
+                    ? 'bg-gray-900 border border-green-500/30 text-white'
+                    : 'bg-red-50 border border-red-200 text-red-800'
+                    }`}>
+                    <div className={`p-2 rounded-full ${toast.type === 'success' ? 'bg-green-500/20 text-green-400' : 'bg-red-100 text-red-600'}`}>
+                        {toast.type === 'success' ? <CheckCircle size={24} /> : <AlertCircle size={24} />}
+                    </div>
+                    <div>
+                        <h4 className={`font-bold text-sm ${toast.type === 'success' ? 'text-white' : 'text-red-900'}`}>
+                            {toast.type === 'success' ? 'Sucesso!' : 'Erro no Envio'}
+                        </h4>
+                        <p className={`text-xs ${toast.type === 'success' ? 'text-gray-300' : 'text-red-700'}`}>
+                            {toast.message}
+                        </p>
+                    </div>
+                    <button
+                        onClick={() => setToast({ ...toast, show: false })}
+                        className={`ml-4 p-1 rounded-full hover:bg-white/10 ${toast.type === 'success' ? 'text-gray-400 hover:text-white' : 'text-red-400 hover:text-red-600'}`}
+                    >
+                        <XCircle size={18} />
+                    </button>
+                </div>
+            )}
         </div>
     );
 };
