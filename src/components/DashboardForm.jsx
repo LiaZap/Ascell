@@ -87,7 +87,7 @@ const DashboardForm = ({ formData, onChange }) => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(payload),
+                body: JSON.stringify(payload, null, 2), // Pretty print to match user preference
             });
 
             if (response.ok) {
