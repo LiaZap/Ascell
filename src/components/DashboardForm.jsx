@@ -74,12 +74,9 @@ const DashboardForm = ({ formData, onChange }) => {
                 // Fields for button structure
                 ...(formData.linkFormat === 'button' && {
                     choices: [
-                        {
-                            id: 'access_link',
-                            label: formData.messageType === 'meeting' ? 'Acessar Reunião' : 'Emitir Certificado',
-                        }
+                        `${formData.messageType === 'meeting' ? 'Acessar Reunião' : 'Emitir Certificado'}|${finalLink}`
                     ],
-                    footerText: 'AScell',
+                    footerText: 'Escolha uma das opções abaixo',
                 })
             };
 
