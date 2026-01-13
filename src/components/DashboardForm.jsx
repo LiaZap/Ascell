@@ -1,4 +1,5 @@
 import { Calendar, Clock, Link as LinkIcon, User, Settings, HelpCircle, FileText, CheckCircle, Video, Shield, Loader2 } from 'lucide-react';
+import { MEETING_TEMPLATES, CERTIFICATE_TEMPLATES } from '../data/templates';
 import { useState, useEffect } from 'react';
 
 const DashboardForm = ({ formData, onChange }) => {
