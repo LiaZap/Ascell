@@ -47,17 +47,22 @@ const DashboardForm = ({ formData, onChange }) => {
 
             // 3. Interpolate Variables
             let processedMessage = messageText || '';
-            processedMessage = processedMessage.replace(/{{time}}/g, formData.meetingTime || '--:--');
-            processedMessage = processedMessage.replace(/{{protocol}}/g, formData.protocolCode);
-            processedMessage = processedMessage.replace(/{{agentName}}/g, formData.agentName || 'Atendente');
-            processedMessage = processedMessage.replace(/{{clientName}}/g, formData.clientName || 'Cliente');
+            console.log('Original Message for Interpolation:', processedMessage);
+
+            // Use regex with whitespace support {{\s*key\s*}}
+            processedMessage = processedMessage.replace(/{{\s*time\s*}}/gi, formData.meetingTime || '--:--');
+            processedMessage = processedMessage.replace(/{{\s*protocol\s*}}/gi, formData.protocolCode);
+            processedMessage = processedMessage.replace(/{{\s*agentName\s*}}/gi, formData.agentName || 'Atendente');
+            processedMessage = processedMessage.replace(/{{\s*clientName\s*}}/gi, formData.clientName || 'Cliente');
 
             // 4. Handle Link & Format
             if (formData.linkFormat === 'button') {
-                processedMessage = processedMessage.replace(/{{link}}/g, '\n👉 *Clique no botão abaixo para acessar*');
+                processedMessage = processedMessage.replace(/{{\s*link\s*}}/gi, '\n👉 *Clique no botão abaixo para acessar*');
             } else {
-                processedMessage = processedMessage.replace(/{{link}}/g, finalLink);
+                processedMessage = processedMessage.replace(/{{\s*link\s*}}/gi, finalLink);
             }
+
+            console.log('Final Processed Message:', processedMessage);
 
             // 5. Construct Payload
             const payload = {
