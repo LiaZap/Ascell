@@ -47,6 +47,10 @@ const INITIAL_FORM_STATE = {
   webhookUrl: ''
 };
 
+const generateProtocol = () => {
+  return 'ASC-' + Math.floor(1000 + Math.random() * 9000);
+};
+
 function App() {
   const [activeView, setActiveView] = useState('dashboard');
   const [formData, setFormData] = useState(INITIAL_FORM_STATE);
@@ -121,9 +125,7 @@ function App() {
     return <LoginPage onLogin={handleLogin} />;
   }
 
-  const generateProtocol = () => {
-    return 'ASC-' + Math.floor(1000 + Math.random() * 9000);
-  };
+
 
   return (
     <div className="min-h-screen bg-[var(--color-bg-page)] text-[var(--color-text-main)] font-sans flex">
