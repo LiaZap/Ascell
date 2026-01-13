@@ -44,10 +44,13 @@ const DashboardForm = ({ formData, onChange, onGenerateProtocol }) => {
 
             // 2. Select Template / Message
             let messageText = formData.customMessage;
+            let usedTemplateName = 'Personalizado';
+
             if (formData.isRandomTemplate) {
                 const randomIndex = Math.floor(Math.random() * currentTemplates.length);
                 const randomTemplate = currentTemplates[randomIndex];
                 messageText = randomTemplate.text;
+                usedTemplateName = randomTemplate.name; // Capture name for feedback
                 console.log(`[Anti-Spam] Selected Random Template: ${randomTemplate.id}`);
             }
 
@@ -106,7 +109,7 @@ const DashboardForm = ({ formData, onChange, onGenerateProtocol }) => {
             });
 
             if (response.ok) {
-                showToast('Dados enviados com sucesso!', 'success');
+                showToast(`Enviado com sucesso! (${usedTemplateName})`, 'success');
 
                 // Save Log to LocalStorage for Sync
                 const newLog = {
