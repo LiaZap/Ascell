@@ -26,26 +26,68 @@ const DashboardForm = ({ formData, onChange }) => {
         }
 
         setIsSending(true);
-        let finalPayload = { ...formData };
-
-        // Random Selection Logic if enabled
-        if (formData.isRandomTemplate) {
-            const randomIndex = Math.floor(Math.random() * currentTemplates.length);
-            const randomTemplate = currentTemplates[randomIndex];
-            finalPayload.selectedTemplateId = randomTemplate.id;
-            finalPayload.customMessage = randomTemplate.text; // Ensure message matches template
-            console.log(`[Anti-Spam] Selected Random Template: ${randomTemplate.id}`);
-        }
 
         try {
-            console.log('Sending Payload:', JSON.stringify(finalPayload, null, 2));
+            // 1. Prepare Base Data
+            const cleanPhone = formData.clientPhone.replace(/\D/g, '');
+            const finalLink = formData.messageType === 'certificate'
+                ? 'https://mp.syngularid.com.br/protocol/emissao'
+                : (formData.isAutoLink
+                    ? `https://ar.syngularid.com.br/videoconferencia?protocolo=${formData.protocolCode}`
+                    : formData.manualLink || '');
+
+            // 2. Select Template / Message
+            let messageText = formData.customMessage;
+            if (formData.isRandomTemplate) {
+                const randomIndex = Math.floor(Math.random() * currentTemplates.length);
+                const randomTemplate = currentTemplates[randomIndex];
+                messageText = randomTemplate.text;
+                console.log(`[Anti-Spam] Selected Random Template: ${randomTemplate.id}`);
+            }
+
+            // 3. Interpolate Variables
+            let processedMessage = messageText || '';
+            processedMessage = processedMessage.replace(/{{time}}/g, formData.meetingTime || '--:--');
+            processedMessage = processedMessage.replace(/{{protocol}}/g, formData.protocolCode);
+            processedMessage = processedMessage.replace(/{{agentName}}/g, formData.agentName || 'Atendente');
+            processedMessage = processedMessage.replace(/{{clientName}}/g, formData.clientName || 'Cliente');
+
+            // 4. Handle Link & Format
+            if (formData.linkFormat === 'button') {
+                processedMessage = processedMessage.replace(/{{link}}/g, '\n👉 *Clique no botão abaixo para acessar*');
+            } else {
+                processedMessage = processedMessage.replace(/{{link}}/g, finalLink);
+            }
+
+            // 5. Construct Payload
+            const payload = {
+                ...formData, // Keep raw data
+                number: cleanPhone,
+                text: processedMessage, // Interpolated message
+                type: formData.linkFormat === 'button' ? 'button' : 'text',
+
+                // Fields for button structure
+                ...(formData.linkFormat === 'button' && {
+                    choices: [
+                        {
+                            id: 'access_link',
+                            label: formData.messageType === 'meeting' ? 'Acessar Reunião' : 'Emitir Certificado',
+                        }
+                    ],
+                    footerText: 'AScell',
+                }),
+
+                finalLink: finalLink
+            };
+
+            console.log('Sending Webhook Payload:', JSON.stringify(payload, null, 2));
 
             const response = await fetch(formData.webhookUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(finalPayload),
+                body: JSON.stringify(payload),
             });
 
             if (response.ok) {
