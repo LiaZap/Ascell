@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+
+@tailwind utilities;
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+  }
+}
+
+:root {
+  /* Modern SaaS Palette (Slate based) */
+  --color-primary: #2563eb;
+  /* Royal Blue */
+  --color-primary-light: #3b82f6;
+  /* Lighter Blue */
+  --color-primary-dark: #1d4ed8;
+  /* Deep Blue */
+
+  --color-bg-page: #f8fafc;
+  /* Slate 50 - Light clean background */
+  --color-bg-card: #ffffff;
+  /* White */
+
+  --color-text-main: #0f172a;
+  /* Slate 900 - Sharp text */
+  --color-text-secondary: #475569;
+  /* Slate 600 - Muted text */
+  --color-text-light: #94a3b8;
+  /* Slate 400 - Light text */
+
+  --color-border: #e2e8f0;
+  /* Slate 200 */
+  --color-border-hover: #cbd5e1;
+  /* Slate 300 */
+
+  --color-success: #10b981;
+  /* Emerald */
+  --color-danger: #ef4444;
+  /* Red */
+
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+
+  --font-family-base: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+body {
+  font-family: var(--font-family-base);
+  background-color: var(--color-bg-page);
+  color: var(--color-text-main);
+  -webkit-font-smoothing: antialiased;
+}

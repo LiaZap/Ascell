@@ -1,0 +1,133 @@
+import { useState, useEffect } from 'react';
+import { Layout } from 'lucide-react';
+import DashboardForm from './components/DashboardForm';
+import MobilePreview from './components/MobilePreview';
+import StatusIndicator from './components/StatusIndicator';
+import Sidebar from './components/Sidebar';
+import LogsPage from './components/LogsPage';
+import UsersPage from './components/UsersPage';
+import SettingsPage from './components/SettingsPage';
+import { MEETING_TEMPLATES, CERTIFICATE_TEMPLATES } from './data/templates';
+
+const INITIAL_FORM_STATE = {
+  // Client Data
+  clientName: '',
+  clientPhone: '',
+
+  // Agent Info
+  agentName: '',
+
+  // Meeting Info
+  meetingDate: '',
+  meetingTime: '',
+
+  // Template Config
+  messageType: 'meeting', // 'meeting' | 'certificate'
+  selectedTemplateId: 'v1',
+  customMessage: '', // New field for editable message
+  isRandomTemplate: true, // Anti-Spam protection default on
+
+  // Link Management
+  isAutoLink: true,
+  manualLink: '',
+  protocolCode: '',
+  linkFormat: 'text', // 'text' | 'button'
+
+  // Sending Config
+  destination: 'private', // 'private' | 'group'
+  scheduleDate: '',
+  scheduleTime: '',
+
+  // Special
+  layoutMode: 'list', // 'list', 'compact', 'visual', etc.
+
+  // Webhook
+  webhookUrl: ''
+};
+
+function App() {
+  const [activeView, setActiveView] = useState('dashboard');
+  const [formData, setFormData] = useState(INITIAL_FORM_STATE);
+
+  useEffect(() => {
+    // Generate an initial protocol code or defaults if needed
+    if (!formData.protocolCode) {
+      setFormData(prev => ({ ...prev, protocolCode: generateProtocol() }));
+    }
+  }, []);
+
+  // Update customMessage when template changes
+  useEffect(() => {
+    const templates = formData.messageType === 'meeting' ? MEETING_TEMPLATES : CERTIFICATE_TEMPLATES;
+    const template = templates.find(t => t.id === formData.selectedTemplateId) || templates[0];
+
+    setFormData(prev => ({
+      ...prev,
+      customMessage: template.text
+    }));
+  }, [formData.selectedTemplateId, formData.messageType]);
+
+  const handleChange = (field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const generateProtocol = () => {
+    return 'ASC-' + Math.floor(1000 + Math.random() * 9000);
+  };
+
+  return (
+    <div className="min-h-screen bg-[var(--color-bg-page)] text-[var(--color-text-main)] font-sans flex">
+      <Sidebar activeView={activeView} onViewChange={setActiveView} />
+
+      <div className="flex-1 ml-64 transition-all duration-300">
+        {/* Dynamic Content Area */}
+        {activeView === 'dashboard' && (
+          <>
+            <header className="sticky top-0 z-40 w-full border-b border-[var(--color-border)] bg-white/80 backdrop-blur-md mb-8">
+              <div className="container mx-auto max-w-7xl h-16 flex items-center justify-between px-6 lg:px-8">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 bg-[var(--color-primary)] rounded-xl shadow-lg shadow-[var(--color-primary)]/20 flex items-center justify-center text-white transform hover:scale-105 transition-transform duration-200">
+                    <Layout size={24} />
+                  </div>
+                  <div>
+                    <h1 className="text-xl font-bold tracking-tight text-[var(--color-text-main)]">Agente de Lembretes</h1>
+                    <p className="text-sm text-[var(--color-text-secondary)] font-medium">Dashboard Administrativo</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4">
+                  <StatusIndicator />
+                </div>
+              </div>
+            </header>
+
+            <main className="container mx-auto max-w-7xl grid grid-cols-1 lg:grid-cols-[1fr_auto] lg:gap-8 items-start px-6 lg:px-8 pb-20">
+              <section className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <DashboardForm
+                  formData={formData}
+                  onChange={handleChange}
+                  onGenerateProtocol={() => handleChange('protocolCode', generateProtocol())}
+                />
+              </section>
+
+              <section className="w-full lg:w-auto mt-8 lg:mt-0 lg:sticky lg:top-24 animate-in fade-in slide-in-from-right-4 duration-700 delay-100 flex justify-center">
+                <MobilePreview formData={formData} />
+              </section>
+            </main>
+          </>
+        )}
+
+        {/* Other Views */}
+        <main className="p-8">
+          {activeView === 'logs' && <LogsPage />}
+          {activeView === 'users' && <UsersPage />}
+          {activeView === 'settings' && <SettingsPage formData={formData} onChange={handleChange} />}
+        </main>
+      </div>
+    </div>
+  );
+}
+
+export default App;
