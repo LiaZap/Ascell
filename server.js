@@ -31,6 +31,38 @@ app.use(express.static(path.join(__dirname, 'dist')));
 
 // API Endpoints
 
+// 0. Setup Database (Run once)
+app.get('/api/setup', async (req, res) => {
+    try {
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS logs (
+                id SERIAL PRIMARY KEY,
+                date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                agent VARCHAR(255) NOT NULL,
+                client VARCHAR(255) NOT NULL,
+                type VARCHAR(50) NOT NULL,
+                status VARCHAR(50) NOT NULL,
+                protocol VARCHAR(50) NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+
+            CREATE TABLE IF NOT EXISTS users (
+                id SERIAL PRIMARY KEY,
+                name VARCHAR(255) NOT NULL,
+                email VARCHAR(255) UNIQUE NOT NULL,
+                role VARCHAR(50) NOT NULL DEFAULT 'Operador',
+                status VARCHAR(50) NOT NULL DEFAULT 'Ativo',
+                last_login TIMESTAMP,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+        `);
+        res.send('Tabelas Criadas com Sucesso! Agora você pode usar o sistema.');
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Erro ao criar tabelas: ' + err.message);
+    }
+});
+
 // 1. Get Logs
 app.get('/api/logs', async (req, res) => {
     try {
