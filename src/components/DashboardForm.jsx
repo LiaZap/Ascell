@@ -1,8 +1,8 @@
-import { Calendar, Clock, Link as LinkIcon, User, Settings, HelpCircle, FileText, CheckCircle, Video, Shield, Loader2, AlertCircle, XCircle } from 'lucide-react';
+import { Calendar, Clock, Link as LinkIcon, User, Settings, HelpCircle, FileText, CheckCircle, Video, Shield, Loader2, AlertCircle, XCircle, RefreshCcw } from 'lucide-react';
 import { MEETING_TEMPLATES, CERTIFICATE_TEMPLATES } from '../data/templates';
 import { useState, useEffect } from 'react';
 
-const DashboardForm = ({ formData, onChange }) => {
+const DashboardForm = ({ formData, onChange, onGenerateProtocol }) => {
     const [isSending, setIsSending] = useState(false);
     const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
 
@@ -145,8 +145,17 @@ const DashboardForm = ({ formData, onChange }) => {
                     </h2>
                     <p className="text-sm text-gray-500 mt-1">Personalize as mensagens e configurações de envio.</p>
                 </div>
-                <div className="text-xs font-mono text-gray-500 bg-gray-50 border border-gray-200 px-3 py-1.5 rounded-md">
-                    Protocolo: <span className="font-bold text-gray-900 ml-1">{formData.protocolCode}</span>
+                <div className="flex items-center gap-2 text-xs font-mono text-gray-500 bg-gray-50 border border-gray-200 px-3 py-1.5 rounded-md hover:border-gray-300 transition-colors">
+                    <span>Protocolo:</span>
+                    <span className="font-bold text-gray-900">{formData.protocolCode}</span>
+                    <button
+                        onClick={onGenerateProtocol}
+                        className="ml-1 p-1 hover:bg-gray-200 rounded-full text-gray-400 hover:text-primary transition-colors"
+                        title="Gerar novo protocolo"
+                        type="button"
+                    >
+                        <RefreshCcw size={12} />
+                    </button>
                 </div>
             </div>
 
