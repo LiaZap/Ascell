@@ -26,11 +26,15 @@ const SettingsPage = ({ formData, onChange }) => {
             if (!response.ok) throw new Error('Falha na comunicação com o Webhook');
 
             const data = await response.json();
-            // Assumes the webhook returns { qrcode: "base64..." } or { qrcode: "url" }
-            if (data.qrcode) {
-                setQrCodeImage(data.qrcode);
+            console.log('QR Code Webhook Response:', data);
+
+            // Handle both Array (n8n default) and Object responses
+            const qrContent = Array.isArray(data) && data.length > 0 ? data[0].qrcode : data.qrcode;
+
+            if (qrContent) {
+                setQrCodeImage(qrContent);
             } else {
-                throw new Error('Formato de resposta inválido (esperado { qrcode: ... })');
+                throw new Error('QR Code não encontrado na resposta. Verifique o console para mais detalhes.');
             }
 
         } catch (error) {
