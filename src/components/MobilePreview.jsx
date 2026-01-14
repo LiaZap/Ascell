@@ -1,4 +1,4 @@
-import { Signal, Battery, Wifi, Video, Phone, MoreVertical, Paperclip, Send, User, FileText, CheckCircle } from 'lucide-react';
+import { Signal, Battery, Wifi, Video, Phone, MoreVertical, Paperclip, Send, User, FileText, CheckCircle, Calendar } from 'lucide-react';
 import { MEETING_TEMPLATES, CERTIFICATE_TEMPLATES } from '../data/templates';
 
 const MobilePreview = ({ formData }) => {
