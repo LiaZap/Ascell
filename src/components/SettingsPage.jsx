@@ -28,13 +28,14 @@ const SettingsPage = ({ formData, onChange }) => {
             const data = await response.json();
             console.log('QR Code Webhook Response:', data);
 
-            // Handle both Array (n8n default) and Object responses
-            const qrContent = Array.isArray(data) && data.length > 0 ? data[0].qrcode : data.qrcode;
+            // Handle n8n array structure with nested instance (common in evolution-api / codechat)
+            const firstItem = Array.isArray(data) ? data[0] : data;
+            const qrContent = firstItem?.instance?.qrcode || firstItem?.qrcode || firstItem?.base64 || firstItem?.data?.qrcode;
 
             if (qrContent) {
                 setQrCodeImage(qrContent);
             } else {
-                throw new Error('QR Code não encontrado na resposta. Verifique o console para mais detalhes.');
+                throw new Error('QR Code não encontrado. Estrutura recebida: ' + JSON.stringify(firstItem).slice(0, 100) + '...');
             }
 
         } catch (error) {
