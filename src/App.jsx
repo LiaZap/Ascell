@@ -44,7 +44,8 @@ const INITIAL_FORM_STATE = {
   layoutMode: 'list', // 'list', 'compact', 'visual', etc.
 
   // Webhook
-  webhookUrl: localStorage.getItem('webhookUrl') || ''
+  webhookUrl: localStorage.getItem('webhookUrl') || '',
+  qrWebhookUrl: localStorage.getItem('qrWebhookUrl') || ''
 };
 
 const generateProtocol = () => {
@@ -56,15 +57,16 @@ function App() {
   const [formData, setFormData] = useState(() => {
     // Lazy init to ensure localStorage is read at mount time, avoiding module caching issues
     const savedUrl = localStorage.getItem('webhookUrl') || '';
+    const savedQrUrl = localStorage.getItem('qrWebhookUrl') || '';
     return {
       ...INITIAL_FORM_STATE,
-      webhookUrl: savedUrl
+      webhookUrl: savedUrl,
+      qrWebhookUrl: savedQrUrl
     };
   });
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
 
-  // Initial Auth Check
   // Initial Auth Check
   useEffect(() => {
     try {
@@ -92,9 +94,14 @@ function App() {
       const loadSettings = async () => {
         try {
           const settings = await api.getSettings();
-          if (settings.webhookUrl) {
-            setFormData(prev => ({ ...prev, webhookUrl: settings.webhookUrl }));
-            localStorage.setItem('webhookUrl', settings.webhookUrl); // Sync local
+          if (settings) {
+            setFormData(prev => ({
+              ...prev,
+              webhookUrl: settings.webhookUrl || prev.webhookUrl,
+              qrWebhookUrl: settings.qrWebhookUrl || prev.qrWebhookUrl
+            }));
+            if (settings.webhookUrl) localStorage.setItem('webhookUrl', settings.webhookUrl);
+            if (settings.qrWebhookUrl) localStorage.setItem('qrWebhookUrl', settings.qrWebhookUrl);
           }
         } catch (err) {
           console.error('Failed to load global settings', err);
@@ -143,10 +150,11 @@ function App() {
     }));
   }, [formData.selectedTemplateId, formData.messageType]);
 
-  // Persist Webhook URL
+  // Persist Webhook URLs
   useEffect(() => {
     localStorage.setItem('webhookUrl', formData.webhookUrl);
-  }, [formData.webhookUrl]);
+    localStorage.setItem('qrWebhookUrl', formData.qrWebhookUrl);
+  }, [formData.webhookUrl, formData.qrWebhookUrl]);
 
   // Sync Agent Name with Current User
   useEffect(() => {
