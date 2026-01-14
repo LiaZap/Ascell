@@ -131,6 +131,7 @@ const UsersPage = () => {
                                     onChange={e => setNewUser({ ...newUser, role: e.target.value })}
                                 >
                                     <option value="Operador">Operador</option>
+                                    <option value="Supervisor">Supervisor</option>
                                     <option value="Administrador">Administrador</option>
                                 </select>
                             </div>
