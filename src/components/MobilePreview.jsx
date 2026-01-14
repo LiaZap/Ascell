@@ -115,10 +115,12 @@ const MobilePreview = ({ formData }) => {
                                 {formData.messageType === 'meeting' ? <Video size={16} /> : <CheckCircle size={16} />}
                                 {formData.messageType === 'meeting' ? 'Acessar Reunião' : 'Emitir Certificado'}
                             </div>
-                            <div className="py-2 px-4 flex items-center justify-center gap-2 text-[#00a884] font-semibold cursor-pointer hover:bg-black/5 transition-colors rounded-b-lg">
-                                <Calendar size={16} />
-                                Reagendar Reunião
-                            </div>
+                            {formData.messageType === 'meeting' && (
+                                <div className="py-2 px-4 flex items-center justify-center gap-2 text-[#00a884] font-semibold cursor-pointer hover:bg-black/5 transition-colors rounded-b-lg">
+                                    <Calendar size={16} />
+                                    Reagendar Reunião
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>

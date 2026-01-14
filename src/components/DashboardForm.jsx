@@ -93,7 +93,7 @@ const DashboardForm = ({ formData, onChange, onGenerateProtocol }) => {
                 ...(formData.linkFormat === 'button' && {
                     choices: [
                         `${formData.messageType === 'meeting' ? 'Acessar Reunião' : 'Emitir Certificado'}|${finalLink}`,
-                        `Reagendar Reunião|Reagendar`
+                        ...(formData.messageType === 'meeting' ? [`Reagendar Reunião|Reagendar`] : [])
                     ],
                     footerText: 'Escolha uma das opções abaixo',
                 })
