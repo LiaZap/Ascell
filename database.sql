@@ -21,6 +21,12 @@ CREATE TABLE IF NOT EXISTS users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Tabela de Configurações
+CREATE TABLE IF NOT EXISTS settings (
+    key VARCHAR(50) PRIMARY KEY,
+    value TEXT
+);
+
 -- Dados Iniciais (Opcional)
 INSERT INTO users (name, email, role, status) VALUES 
 ('Paulo Admin', 'admin@ascel.com', 'Administrador', 'Ativo');

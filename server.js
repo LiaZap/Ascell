@@ -51,6 +51,11 @@ const initDb = async () => {
                 last_login TIMESTAMP,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
+
+            CREATE TABLE IF NOT EXISTS settings (
+                key VARCHAR(50) PRIMARY KEY,
+                value TEXT
+            );
         `);
 
         // Add password column if it doesn't exist (migration for existing dbs)
