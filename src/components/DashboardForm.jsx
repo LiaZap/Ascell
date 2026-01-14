@@ -207,22 +207,30 @@ const DashboardForm = ({ formData, onChange, onGenerateProtocol }) => {
                             <label className="block text-sm font-medium text-gray-700">Nome do Funcionário</label>
                             <input
                                 type="text"
-                                className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none text-sm"
+                                className="w-full px-4 py-2.5 bg-gray-100 border border-gray-200 rounded-lg text-gray-500 cursor-not-allowed outline-none text-sm font-medium"
                                 placeholder="Ex: Maria"
                                 value={formData.agentName}
-                                onChange={(e) => onChange('agentName', e.target.value)}
+                                readOnly
                             />
                         </div>
                         <div className="space-y-1.5 col-span-full md:col-span-1">
                             <label className="block text-sm font-medium text-gray-700">WhatsApp do Cliente</label>
-                            <input
-                                type="tel"
-                                className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none text-sm"
-                                placeholder="+55 (11) 99999-9999"
-                                value={formData.clientPhone}
-                                onChange={(e) => onChange('clientPhone', e.target.value)}
-                                required
-                            />
+                            <div className="relative">
+                                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                    <span className="text-gray-500 font-medium sm:text-sm">🇧🇷 +55</span>
+                                </div>
+                                <input
+                                    type="tel"
+                                    className="w-full pl-20 px-4 py-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none text-sm"
+                                    placeholder="(11) 99999-9999"
+                                    value={formData.clientPhone.replace(/^\+55\s?/, '')}
+                                    onChange={(e) => {
+                                        const cleanValue = e.target.value.replace(/^\+55\s?/, '');
+                                        onChange('clientPhone', '+55 ' + cleanValue);
+                                    }}
+                                    required
+                                />
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -266,35 +274,17 @@ const DashboardForm = ({ formData, onChange, onGenerateProtocol }) => {
 
                             <div className="flex items-center justify-between">
                                 <label className="block text-sm font-medium text-gray-700">Link da Reunião</label>
-
-                                {/* Moved Toggle Here */}
-                                <div className="flex items-center gap-2">
-                                    <label className="text-xs font-medium text-gray-500 cursor-pointer select-none" onClick={() => onChange('isAutoLink', !formData.isAutoLink)}>
-                                        Gerar Automático
-                                    </label>
-                                    <button
-                                        type="button"
-                                        className={`w-9 h-5 rounded-full relative transition-colors focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary/40 ${formData.isAutoLink ? 'bg-primary' : 'bg-gray-300'}`}
-                                        onClick={() => onChange('isAutoLink', !formData.isAutoLink)}
-                                    >
-                                        <span className={`block w-3.5 h-3.5 bg-white rounded-full shadow-sm absolute top-0.5 transition-transform duration-200 ${formData.isAutoLink ? 'translate-x-4' : 'translate-x-1'}`} />
-                                    </button>
-                                </div>
                             </div>
 
                             <div className="relative group">
-                                <LinkIcon size={16} className={`absolute left-3 top-3 transition-colors ${formData.isAutoLink ? 'text-gray-400' : 'text-gray-500 group-focus-within:text-primary'}`} />
+                                <LinkIcon size={16} className="absolute left-3 top-3 text-gray-500 group-focus-within:text-primary transition-colors" />
                                 <input
                                     type="url"
-                                    className={`w-full pl-10 pr-4 py-2.5 border rounded-lg transition-all outline-none text-sm ${formData.isAutoLink
-                                        ? 'bg-gray-100 border-gray-200 text-gray-500 cursor-not-allowed select-none'
-                                        : 'bg-white border-gray-300 focus:ring-2 focus:ring-primary/20 focus:border-primary'
-                                        }`}
-                                    placeholder="https://meet.google.com/..."
-                                    value={formData.isAutoLink && formData.protocolCode ? `https://ar.syngularid.com.br/videoconferencia?protocolo=${formData.protocolCode}` : formData.manualLink}
+                                    className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none text-sm"
+                                    placeholder="Cole o link da reunião aqui..."
+                                    value={formData.manualLink}
                                     onChange={(e) => onChange('manualLink', e.target.value)}
-                                    disabled={formData.isAutoLink}
-                                    required={!formData.isAutoLink}
+                                    required
                                 />
                             </div>
                         </div>

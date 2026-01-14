@@ -12,9 +12,7 @@ const MobilePreview = ({ formData }) => {
 
     const finalLink = formData.messageType === 'certificate'
         ? CERTIFICATE_LINK
-        : (formData.isAutoLink
-            ? `https://ar.syngularid.com.br/videoconferencia?protocolo=${formData.protocolCode}`
-            : formData.manualLink || 'https://ar.syngularid.com.br/...');
+        : (formData.manualLink || 'https://ar.syngularid.com.br/...');
 
     // 3. Find template
     const templates = formData.messageType === 'meeting' ? MEETING_TEMPLATES : CERTIFICATE_TEMPLATES;

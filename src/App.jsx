@@ -30,7 +30,7 @@ const INITIAL_FORM_STATE = {
   isRandomTemplate: true, // Anti-Spam protection default on
 
   // Link Management
-  isAutoLink: true,
+  isAutoLink: false,
   manualLink: '',
   protocolCode: '',
   linkFormat: 'text', // 'text' | 'button'
@@ -147,6 +147,16 @@ function App() {
   useEffect(() => {
     localStorage.setItem('webhookUrl', formData.webhookUrl);
   }, [formData.webhookUrl]);
+
+  // Sync Agent Name with Current User
+  useEffect(() => {
+    if (currentUser?.name) {
+      setFormData(prev => ({
+        ...prev,
+        agentName: currentUser.name
+      }));
+    }
+  }, [currentUser]);
 
   const handleChange = (field, value) => {
     setFormData(prev => ({

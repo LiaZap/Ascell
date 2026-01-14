@@ -3,9 +3,9 @@ import { LayoutDashboard, FileText, Users, LogOut, Settings } from 'lucide-react
 const Sidebar = ({ activeView, onViewChange, onLogout, user }) => {
 
     const allMenuItems = [
-        { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, roles: ['Operador', 'Administrador'] },
-        { id: 'logs', label: 'Logs de Disparo', icon: FileText, roles: ['Administrador'] },
-        { id: 'users', label: 'Gestão de Usuários', icon: Users, roles: ['Administrador'] },
+        { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, roles: ['Operador', 'Administrador', 'Supervisor'] },
+        { id: 'logs', label: 'Logs de Disparo', icon: FileText, roles: ['Administrador', 'Supervisor'] },
+        { id: 'users', label: 'Gestão de Usuários', icon: Users, roles: ['Administrador', 'Supervisor'] },
         { id: 'settings', label: 'Configurações', icon: Settings, roles: ['Administrador'] },
     ];
 
