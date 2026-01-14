@@ -6,7 +6,7 @@ const Sidebar = ({ activeView, onViewChange, onLogout, user }) => {
         { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, roles: ['Operador', 'Administrador', 'Supervisor'] },
         { id: 'logs', label: 'Logs de Disparo', icon: FileText, roles: ['Administrador', 'Supervisor'] },
         { id: 'users', label: 'Gestão de Usuários', icon: Users, roles: ['Administrador', 'Supervisor'] },
-        { id: 'settings', label: 'Configurações', icon: Settings, roles: ['Administrador'] },
+        { id: 'settings', label: 'Configurações', icon: Settings, roles: ['Administrador', 'Supervisor'] },
     ];
 
     const menuItems = allMenuItems.filter(item =>

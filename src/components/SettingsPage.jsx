@@ -2,7 +2,8 @@ import { Save, QrCode, Smartphone, Loader2 } from 'lucide-react';
 import { api } from '../services/api';
 import { useState } from 'react';
 
-const SettingsPage = ({ formData, onChange }) => {
+const SettingsPage = ({ formData, onChange, user }) => {
+    const isAdmin = user?.role === 'Administrador';
     const [instancePhone, setInstancePhone] = useState('');
     const [qrCodeImage, setQrCodeImage] = useState(null);
     const [isLoadingQr, setIsLoadingQr] = useState(false);
@@ -55,73 +56,75 @@ const SettingsPage = ({ formData, onChange }) => {
             </div>
 
             {/* Main Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-5xl">
+            <div className={`grid grid-cols-1 ${isAdmin ? 'lg:grid-cols-2' : 'lg:grid-cols-1 max-w-xl'} gap-6 max-w-5xl`}>
 
                 {/* Column 1: Integrations */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden h-fit">
-                    <div className="p-6 border-b border-gray-100">
-                        <h3 className="font-semibold text-gray-900">Integrações Externas</h3>
-                        <p className="text-sm text-gray-500 mt-1">Configure a conexão com n8n e outras ferramentas.</p>
-                    </div>
+                {isAdmin && (
+                    <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden h-fit">
+                        <div className="p-6 border-b border-gray-100">
+                            <h3 className="font-semibold text-gray-900">Integrações Externas</h3>
+                            <p className="text-sm text-gray-500 mt-1">Configure a conexão com n8n e outras ferramentas.</p>
+                        </div>
 
-                    <div className="p-6 space-y-6">
-                        <div className="space-y-2">
-                            <label className="block text-sm font-medium text-gray-700">URL do Webhook (Envio)</label>
-                            <div className="relative">
-                                <input
-                                    type="url"
-                                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-600 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all font-mono"
-                                    placeholder="https://n8n.../webhook/envio"
-                                    value={formData.webhookUrl}
-                                    onChange={(e) => onChange('webhookUrl', e.target.value)}
-                                />
+                        <div className="p-6 space-y-6">
+                            <div className="space-y-2">
+                                <label className="block text-sm font-medium text-gray-700">URL do Webhook (Envio)</label>
+                                <div className="relative">
+                                    <input
+                                        type="url"
+                                        className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-600 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all font-mono"
+                                        placeholder="https://n8n.../webhook/envio"
+                                        value={formData.webhookUrl}
+                                        onChange={(e) => onChange('webhookUrl', e.target.value)}
+                                    />
+                                </div>
+                                <p className="text-xs text-gray-500">
+                                    Esta URL receberá os dados para envio da mensagem.
+                                </p>
                             </div>
-                            <p className="text-xs text-gray-500">
-                                Esta URL receberá os dados para envio da mensagem.
-                            </p>
-                        </div>
 
-                        <div className="space-y-2">
-                            <label className="block text-sm font-medium text-gray-700">URL do Webhook (QR Code)</label>
-                            <div className="relative">
-                                <input
-                                    type="url"
-                                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-600 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all font-mono"
-                                    placeholder="https://n8n.../webhook/qrcode"
-                                    value={formData.qrWebhookUrl || ''}
-                                    onChange={(e) => onChange('qrWebhookUrl', e.target.value)}
-                                />
+                            <div className="space-y-2">
+                                <label className="block text-sm font-medium text-gray-700">URL do Webhook (QR Code)</label>
+                                <div className="relative">
+                                    <input
+                                        type="url"
+                                        className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-600 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all font-mono"
+                                        placeholder="https://n8n.../webhook/qrcode"
+                                        value={formData.qrWebhookUrl || ''}
+                                        onChange={(e) => onChange('qrWebhookUrl', e.target.value)}
+                                    />
+                                </div>
+                                <p className="text-xs text-gray-500">
+                                    Webhook responsável por gerar o QR Code de conexão.
+                                </p>
                             </div>
-                            <p className="text-xs text-gray-500">
-                                Webhook responsável por gerar o QR Code de conexão.
-                            </p>
-                        </div>
 
 
-                        <div className="pt-4 flex justify-end">
-                            <button
-                                className="flex items-center gap-2 px-6 py-2.5 bg-primary text-white font-medium rounded-lg shadow-lg shadow-primary/20 hover:bg-primary-dark transition-all active:translate-y-0.5 w-full justify-center"
-                                onClick={async () => {
-                                    try {
-                                        await api.updateSettings({
-                                            webhookUrl: formData.webhookUrl,
-                                            qrWebhookUrl: formData.qrWebhookUrl // Save new field
-                                        });
-                                        // Update local storage
-                                        localStorage.setItem('settings_webhookUrl', formData.webhookUrl);
-                                        localStorage.setItem('settings_qrWebhookUrl', formData.qrWebhookUrl);
-                                        alert('Configurações salvas com sucesso!');
-                                    } catch (error) {
-                                        alert('Erro ao salvar: ' + error.message);
-                                    }
-                                }}
-                            >
-                                <Save size={18} />
-                                Salvar Alterações
-                            </button>
+                            <div className="pt-4 flex justify-end">
+                                <button
+                                    className="flex items-center gap-2 px-6 py-2.5 bg-primary text-white font-medium rounded-lg shadow-lg shadow-primary/20 hover:bg-primary-dark transition-all active:translate-y-0.5 w-full justify-center"
+                                    onClick={async () => {
+                                        try {
+                                            await api.updateSettings({
+                                                webhookUrl: formData.webhookUrl,
+                                                qrWebhookUrl: formData.qrWebhookUrl // Save new field
+                                            });
+                                            // Update local storage
+                                            localStorage.setItem('settings_webhookUrl', formData.webhookUrl);
+                                            localStorage.setItem('settings_qrWebhookUrl', formData.qrWebhookUrl);
+                                            alert('Configurações salvas com sucesso!');
+                                        } catch (error) {
+                                            alert('Erro ao salvar: ' + error.message);
+                                        }
+                                    }}
+                                >
+                                    <Save size={18} />
+                                    Salvar Alterações
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
+                )}
 
                 {/* Column 2: WhatsApp Connection */}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden h-fit">

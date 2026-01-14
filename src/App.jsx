@@ -239,7 +239,7 @@ function App() {
         <main className="p-8">
           {activeView === 'logs' && <LogsPage />}
           {activeView === 'users' && <UsersPage />}
-          {activeView === 'settings' && <SettingsPage formData={formData} onChange={handleChange} />}
+          {activeView === 'settings' && <SettingsPage formData={formData} onChange={handleChange} user={currentUser} />}
         </main>
       </div>
     </div>
