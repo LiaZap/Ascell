@@ -94,7 +94,7 @@ const MobilePreview = ({ formData }) => {
 
                     {/* Message Content */}
                     <div className="px-2 pt-2 pb-1 whitespace-pre-wrap leading-relaxed break-words" dangerouslySetInnerHTML={{
-                        __html: (formData.agentName ? `<strong>${formData.agentName}</strong><br/>` : '') + messageContent
+                        __html: (formData.agentName ? `<strong>${formData.agentName}</strong><br/><br/>` : '') + messageContent
                     }} />
 
 
@@ -110,9 +110,15 @@ const MobilePreview = ({ formData }) => {
 
                     {/* BUTTON SIMULATION (If Button Mode) */}
                     {formData.linkFormat === 'button' && (
-                        <div className="border-t border-black/5 mt-1 -mx-1 pt-2 pb-2 px-4 flex items-center justify-center gap-2 text-[#00a884] font-semibold cursor-pointer hover:bg-black/5 transition-colors rounded-b-lg">
-                            {formData.messageType === 'meeting' ? <Video size={16} /> : <CheckCircle size={16} />}
-                            {formData.messageType === 'meeting' ? 'Acessar Reunião' : 'Emitir Certificado'}
+                        <div className="border-t border-black/5 mt-1 -mx-1">
+                            <div className="py-2 px-4 flex items-center justify-center gap-2 text-[#00a884] font-semibold cursor-pointer hover:bg-black/5 transition-colors border-b border-black/5 last:border-0 last:rounded-b-lg">
+                                {formData.messageType === 'meeting' ? <Video size={16} /> : <CheckCircle size={16} />}
+                                {formData.messageType === 'meeting' ? 'Acessar Reunião' : 'Emitir Certificado'}
+                            </div>
+                            <div className="py-2 px-4 flex items-center justify-center gap-2 text-[#00a884] font-semibold cursor-pointer hover:bg-black/5 transition-colors rounded-b-lg">
+                                <Calendar size={16} />
+                                Reagendar Reunião
+                            </div>
                         </div>
                     )}
                 </div>
