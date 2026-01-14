@@ -33,7 +33,7 @@ const INITIAL_FORM_STATE = {
   isAutoLink: false,
   manualLink: '',
   protocolCode: '',
-  linkFormat: 'text', // 'text' | 'button'
+  linkFormat: 'button', // 'text' | 'button'
 
   // Sending Config
   destination: 'private', // 'private' | 'group'
