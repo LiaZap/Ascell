@@ -339,6 +339,29 @@ const SettingsPage = ({ formData, onChange, user }) => {
                                     </p>
                                 </div>
 
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2 duration-500">
+                                    <div className="space-y-2">
+                                        <label className="block text-sm font-medium text-gray-700">Server URL (Opcional)</label>
+                                        <input
+                                            type="text"
+                                            className="w-full px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all placeholder:text-gray-300"
+                                            placeholder="https://api.uazapi.com"
+                                            value={formData.serverUrl || ''}
+                                            onChange={(e) => onChange('serverUrl', e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="block text-sm font-medium text-gray-700">Token da Instância (Opcional)</label>
+                                        <input
+                                            type="text"
+                                            className="w-full px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all placeholder:text-gray-300"
+                                            placeholder="Ex: 502ed0fa..."
+                                            value={formData.instanceToken || ''}
+                                            onChange={(e) => onChange('instanceToken', e.target.value)}
+                                        />
+                                    </div>
+                                </div>
+
                                 <button
                                     onClick={async () => {
                                         // If user wants to manually save without generating QR (for testing or if already connected)
