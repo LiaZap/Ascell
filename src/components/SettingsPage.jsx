@@ -368,7 +368,14 @@ const SettingsPage = ({ formData, onChange, user }) => {
                                         if (instancePhone) {
                                             onChange('instancePhone', instancePhone);
                                             onChange('instanceStatus', 'connected');
-                                            await handleSaveSettings({ instancePhone: instancePhone, instanceStatus: 'connected' });
+
+                                            // Explicitly pass manual inputs to override any auto-extraction
+                                            await handleSaveSettings({
+                                                instancePhone: instancePhone,
+                                                instanceStatus: 'connected',
+                                                serverUrl: formData.serverUrl,
+                                                instanceToken: formData.instanceToken
+                                            });
                                         } else {
                                             handleGenerateQRCode();
                                         }
