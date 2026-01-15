@@ -230,286 +230,286 @@ const SettingsPage = ({ formData, onChange, user }) => {
                             </div>
 
 
-                        </div>
 
-                        <div className="space-y-2 border-t border-gray-100 pt-4 mt-4">
-                            <label className="block text-sm font-medium text-blue-700">Link de Conexão da Instância (API)</label>
-                            <div className="relative flex gap-2">
-                                <input
-                                    type="url"
-                                    className="w-full px-4 py-2.5 bg-blue-50 border border-blue-100 rounded-lg text-sm text-gray-600 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all font-mono"
-                                    placeholder="Cole o link completo da API aqui..."
-                                    value={formData.connectionLink || ''}
-                                    onChange={(e) => onChange('connectionLink', e.target.value)}
-                                />
-                                <button
-                                    onClick={async () => {
-                                        if (!formData.connectionLink) {
-                                            alert('Cole o link da API para verificar.');
-                                            return;
-                                        }
 
-                                        setIsLoadingQr(true);
-                                        try {
-                                            const urlObj = new URL(formData.connectionLink);
-                                            const extractedServerUrl = urlObj.origin;
-                                            const params = new URLSearchParams(urlObj.search);
-                                            const extractedToken = params.get('token') || params.get('apikey') || params.get('key');
-
-                                            if (!extractedToken) {
-                                                throw new Error('Não foi possível encontrar o Token no link. Verifique se o link tem ?token=...');
+                            <div className="space-y-2 border-t border-gray-100 pt-4 mt-4">
+                                <label className="block text-sm font-medium text-blue-700">Link de Conexão da Instância (API)</label>
+                                <div className="relative flex gap-2">
+                                    <input
+                                        type="url"
+                                        className="w-full px-4 py-2.5 bg-blue-50 border border-blue-100 rounded-lg text-sm text-gray-600 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all font-mono"
+                                        placeholder="Cole o link completo da API aqui..."
+                                        value={formData.connectionLink || ''}
+                                        onChange={(e) => onChange('connectionLink', e.target.value)}
+                                    />
+                                    <button
+                                        onClick={async () => {
+                                            if (!formData.connectionLink) {
+                                                alert('Cole o link da API para verificar.');
+                                                return;
                                             }
 
-                                            // Test Connection
-                                            const statusUrl = `${extractedServerUrl}/instance/status`;
-                                            console.log('Testing connection to:', statusUrl);
+                                            setIsLoadingQr(true);
+                                            try {
+                                                const urlObj = new URL(formData.connectionLink);
+                                                const extractedServerUrl = urlObj.origin;
+                                                const params = new URLSearchParams(urlObj.search);
+                                                const extractedToken = params.get('token') || params.get('apikey') || params.get('key');
 
-                                            const response = await fetch(statusUrl, {
-                                                method: 'GET',
-                                                headers: {
-                                                    'token': extractedToken,
-                                                    'Content-Type': 'application/json'
+                                                if (!extractedToken) {
+                                                    throw new Error('Não foi possível encontrar o Token no link. Verifique se o link tem ?token=...');
                                                 }
-                                            });
 
-                                            if (!response.ok) throw new Error(`Erro API: ${response.status}`);
-                                            const data = await response.json();
+                                                // Test Connection
+                                                const statusUrl = `${extractedServerUrl}/instance/status`;
+                                                console.log('Testing connection to:', statusUrl);
 
-                                            if (data && data.instance && (data.instance.status === 'open' || data.instance.status === 'connected')) {
-                                                alert('✅ Conexão Confirmada! Configurando sistema...');
-
-                                                const remotePhone = data.instance.owner?.split('@')[0] || instancePhone;
-                                                setInstancePhone(remotePhone);
-                                                onChange('instancePhone', remotePhone);
-
-                                                // Save extracted data
-                                                onChange('serverUrl', extractedServerUrl);
-                                                onChange('instanceToken', extractedToken);
-                                                onChange('instanceStatus', 'connected');
-
-                                                await handleSaveSettings({
-                                                    instancePhone: remotePhone,
-                                                    instanceStatus: 'connected',
-                                                    serverUrl: extractedServerUrl,
-                                                    instanceToken: extractedToken,
-                                                    qrWebhookUrl: formData.connectionLink // Optional: save source
+                                                const response = await fetch(statusUrl, {
+                                                    method: 'GET',
+                                                    headers: {
+                                                        'token': extractedToken,
+                                                        'Content-Type': 'application/json'
+                                                    }
                                                 });
-                                            } else {
-                                                alert('⚠️ A API respondeu, mas a instância não está conectada.\nStatus: ' + (data?.instance?.status || 'desconhecido'));
-                                            }
 
-                                        } catch (error) {
-                                            console.error(error);
-                                            alert('❌ Falha na conexão: ' + error.message);
-                                        } finally {
-                                            setIsLoadingQr(false);
-                                        }
+                                                if (!response.ok) throw new Error(`Erro API: ${response.status}`);
+                                                const data = await response.json();
+
+                                                if (data && data.instance && (data.instance.status === 'open' || data.instance.status === 'connected')) {
+                                                    alert('✅ Conexão Confirmada! Configurando sistema...');
+
+                                                    const remotePhone = data.instance.owner?.split('@')[0] || instancePhone;
+                                                    setInstancePhone(remotePhone);
+                                                    onChange('instancePhone', remotePhone);
+
+                                                    // Save extracted data
+                                                    onChange('serverUrl', extractedServerUrl);
+                                                    onChange('instanceToken', extractedToken);
+                                                    onChange('instanceStatus', 'connected');
+
+                                                    await handleSaveSettings({
+                                                        instancePhone: remotePhone,
+                                                        instanceStatus: 'connected',
+                                                        serverUrl: extractedServerUrl,
+                                                        instanceToken: extractedToken,
+                                                        qrWebhookUrl: formData.connectionLink // Optional: save source
+                                                    });
+                                                } else {
+                                                    alert('⚠️ A API respondeu, mas a instância não está conectada.\nStatus: ' + (data?.instance?.status || 'desconhecido'));
+                                                }
+
+                                            } catch (error) {
+                                                console.error(error);
+                                                alert('❌ Falha na conexão: ' + error.message);
+                                            } finally {
+                                                setIsLoadingQr(false);
+                                            }
+                                        }}
+                                        className="px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-all shadow-md shadow-blue-200"
+                                        title="Verificar e Conectar"
+                                    >
+                                        VERIFICAR
+                                    </button>
+                                </div>
+                                <p className="text-xs text-blue-600/70">
+                                    Cole o link completo (ex: https://api.site.com/instance/status?token=123) e clique em verificar.
+                                </p>
+                            </div>
+
+                            <div className="pt-4 flex justify-end">
+                                <button
+                                    className="flex items-center gap-2 px-6 py-2.5 bg-primary text-white font-medium rounded-lg shadow-lg shadow-primary/20 hover:bg-primary-dark transition-all active:translate-y-0.5 w-full justify-center"
+                                    onClick={async () => {
+                                        const success = await handleSaveSettings();
+                                        if (success) alert('Configurações salvas com sucesso!');
                                     }}
-                                    className="px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-all shadow-md shadow-blue-200"
-                                    title="Verificar e Conectar"
                                 >
-                                    VERIFICAR
+                                    <Save size={18} />
+                                    Salvar Alterações
                                 </button>
                             </div>
-                            <p className="text-xs text-blue-600/70">
-                                Cole o link completo (ex: https://api.site.com/instance/status?token=123) e clique em verificar.
-                            </p>
                         </div>
-
-                        <div className="pt-4 flex justify-end">
-                            <button
-                                className="flex items-center gap-2 px-6 py-2.5 bg-primary text-white font-medium rounded-lg shadow-lg shadow-primary/20 hover:bg-primary-dark transition-all active:translate-y-0.5 w-full justify-center"
-                                onClick={async () => {
-                                    const success = await handleSaveSettings();
-                                    if (success) alert('Configurações salvas com sucesso!');
-                                }}
-                            >
-                                <Save size={18} />
-                                Salvar Alterações
-                            </button>
-                        </div>
-                    </div>
                     </div>
                 )}
 
-            {/* Column 2: WhatsApp Connection */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden h-fit">
-                <div className="p-6 border-b border-gray-100 bg-emerald-50/50">
-                    <div className="flex items-center gap-2 text-emerald-800">
-                        <QrCode size={20} />
-                        <h3 className="font-semibold">Conexão WhatsApp</h3>
+                {/* Column 2: WhatsApp Connection */}
+                <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden h-fit">
+                    <div className="p-6 border-b border-gray-100 bg-emerald-50/50">
+                        <div className="flex items-center gap-2 text-emerald-800">
+                            <QrCode size={20} />
+                            <h3 className="font-semibold">Conexão WhatsApp</h3>
+                        </div>
+                        <p className="text-sm text-emerald-600/80 mt-1">Conecte sua instância para enviar mensagens.</p>
                     </div>
-                    <p className="text-sm text-emerald-600/80 mt-1">Conecte sua instância para enviar mensagens.</p>
-                </div>
 
-                <div className="p-6 space-y-6">
-                    {formData.instancePhone ? (
-                        // Connected State (Dark Card UI)
-                        <div className="space-y-4 animate-in fade-in zoom-in-95 duration-300">
-                            {/* Card Container */}
-                            <div className="bg-[#0f172a] rounded-xl p-0 relative overflow-hidden group shadow-xl">
-                                {/* Dashed Border Container */}
-                                <div className="absolute inset-0 m-1 border-2 border-dashed border-sky-500/30 rounded-lg pointer-events-none group-hover:border-sky-500/50 transition-colors"></div>
+                    <div className="p-6 space-y-6">
+                        {formData.instancePhone ? (
+                            // Connected State (Dark Card UI)
+                            <div className="space-y-4 animate-in fade-in zoom-in-95 duration-300">
+                                {/* Card Container */}
+                                <div className="bg-[#0f172a] rounded-xl p-0 relative overflow-hidden group shadow-xl">
+                                    {/* Dashed Border Container */}
+                                    <div className="absolute inset-0 m-1 border-2 border-dashed border-sky-500/30 rounded-lg pointer-events-none group-hover:border-sky-500/50 transition-colors"></div>
 
-                                <div className="flex flex-col md:flex-row h-full relative z-10">
+                                    <div className="flex flex-col md:flex-row h-full relative z-10">
 
-                                    {/* Left Side: Instance Data */}
-                                    <div className="flex-1 p-6 md:p-8 space-y-6">
-                                        <h4 className="font-bold text-xl text-white">Dados da instância</h4>
+                                        {/* Left Side: Instance Data */}
+                                        <div className="flex-1 p-6 md:p-8 space-y-6">
+                                            <h4 className="font-bold text-xl text-white">Dados da instância</h4>
 
-                                        <div className="space-y-5">
-                                            <div>
-                                                <p className="text-slate-400 text-xs font-semibold mb-1">Server URL:</p>
-                                                <p className="font-mono text-sm text-sky-400 truncate hover:text-sky-300 transition-colors select-all">
-                                                    {formData.serverUrl || 'https://api.gateway.com'}
-                                                </p>
+                                            <div className="space-y-5">
+                                                <div>
+                                                    <p className="text-slate-400 text-xs font-semibold mb-1">Server URL:</p>
+                                                    <p className="font-mono text-sm text-sky-400 truncate hover:text-sky-300 transition-colors select-all">
+                                                        {formData.serverUrl || 'https://api.gateway.com'}
+                                                    </p>
+                                                </div>
+
+                                                <div>
+                                                    <p className="text-slate-400 text-xs font-semibold mb-1">Instance Token:</p>
+                                                    <p className="font-mono text-sm text-white/90 truncate select-all">
+                                                        {formData.instanceToken || '••••••••••••••••••••'}
+                                                    </p>
+                                                </div>
+
+                                                <div>
+                                                    <p className="text-slate-400 text-xs font-semibold mb-1">Número conectado:</p>
+                                                    <p className="font-mono text-lg font-bold text-white tracking-wide">
+                                                        {formData.instancePhone}
+                                                    </p>
+                                                </div>
+
+                                                <div>
+                                                    <p className="text-slate-400 text-xs font-semibold mb-1">Status:</p>
+                                                    <StatusDisplay />
+                                                </div>
                                             </div>
+                                        </div>
 
-                                            <div>
-                                                <p className="text-slate-400 text-xs font-semibold mb-1">Instance Token:</p>
-                                                <p className="font-mono text-sm text-white/90 truncate select-all">
-                                                    {formData.instanceToken || '••••••••••••••••••••'}
-                                                </p>
-                                            </div>
+                                        {/* Right Side: Logo Area */}
+                                        <div className="w-full md:w-64 bg-white p-6 flex items-center justify-center relative">
+                                            {/* Decorative Accent */}
+                                            <div className="absolute bottom-0 left-0 right-0 h-2 bg-gradient-to-r from-emerald-400 to-blue-600"></div>
 
-                                            <div>
-                                                <p className="text-slate-400 text-xs font-semibold mb-1">Número conectado:</p>
-                                                <p className="font-mono text-lg font-bold text-white tracking-wide">
-                                                    {formData.instancePhone}
-                                                </p>
-                                            </div>
-
-                                            <div>
-                                                <p className="text-slate-400 text-xs font-semibold mb-1">Status:</p>
-                                                <StatusDisplay />
+                                            <div className="text-center">
+                                                {/* Placeholder for Logo - You can replace with <img /> */}
+                                                <div className="w-20 h-20 mx-auto bg-blue-600 rounded-xl flex items-center justify-center mb-3 text-white shadow-lg">
+                                                    <Smartphone size={32} />
+                                                </div>
+                                                <h3 className="font-bold text-slate-800 text-lg">Comercial</h3>
+                                                <p className="text-xs text-slate-400 font-semibold tracking-wider uppercase">Grupo Ascel</p>
                                             </div>
                                         </div>
                                     </div>
+                                </div>
 
-                                    {/* Right Side: Logo Area */}
-                                    <div className="w-full md:w-64 bg-white p-6 flex items-center justify-center relative">
-                                        {/* Decorative Accent */}
-                                        <div className="absolute bottom-0 left-0 right-0 h-2 bg-gradient-to-r from-emerald-400 to-blue-600"></div>
+                                {/* Action Buttons */}
+                                <div className="grid grid-cols-1 gap-3">
+                                    <button
+                                        onClick={() => document.querySelector('input[placeholder*="webhook/envio"]')?.focus()}
+                                        className="w-full py-3 bg-[#0284c7] text-white font-bold rounded-lg hover:bg-[#0369a1] transition-all shadow-lg shadow-sky-900/20 text-sm"
+                                    >
+                                        Configurar Webhook
+                                    </button>
 
-                                        <div className="text-center">
-                                            {/* Placeholder for Logo - You can replace with <img /> */}
-                                            <div className="w-20 h-20 mx-auto bg-blue-600 rounded-xl flex items-center justify-center mb-3 text-white shadow-lg">
-                                                <Smartphone size={32} />
+                                    <button
+                                        onClick={async () => {
+                                            if (confirm('Tem certeza que deseja desconectar?')) {
+                                                onChange('instancePhone', '');
+                                                onChange('instanceStatus', 'disconnected');
+                                                await handleSaveSettings({
+                                                    instancePhone: '',
+                                                    instanceStatus: 'disconnected',
+                                                    serverUrl: '',
+                                                    instanceToken: ''
+                                                });
+                                            }
+                                        }}
+                                        className="w-full py-3 bg-[#1e293b] text-red-500 font-bold rounded-lg border border-red-900/30 hover:bg-red-950/20 hover:border-red-500/50 transition-all text-sm uppercase tracking-wide"
+                                    >
+                                        Desconectar
+                                    </button>
+                                </div>
+                            </div>
+                        ) : (
+                            // Disconnected State (Form)
+                            <div className="space-y-6">
+                                <div className="space-y-2">
+                                    <label className="block text-sm font-medium text-gray-700">Telefone da Instância</label>
+                                    <div className="relative">
+                                        <Smartphone size={16} className="absolute left-3 top-3 text-gray-400" />
+                                        <input
+                                            type="tel"
+                                            className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all"
+                                            placeholder="551199999999"
+                                            value={instancePhone}
+                                            onChange={(e) => setInstancePhone(e.target.value)}
+                                        />
+                                    </div>
+                                    <p className="text-xs text-gray-500">
+                                        Informe o número conectado para gerar o QR Code de sessão.
+                                    </p>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2 duration-500 hidden">
+                                        {/* Manual inputs hidden in favor of easy link paste on left side */}
+                                    </div>
+
+                                    <button
+                                        onClick={async () => {
+                                            // If user wants to manually save without generating QR (for testing or if already connected)
+                                            if (instancePhone) {
+                                                onChange('instancePhone', instancePhone);
+                                                onChange('instanceStatus', 'connected');
+
+                                                // Explicitly pass manual inputs to override any auto-extraction
+                                                await handleSaveSettings({
+                                                    instancePhone: instancePhone,
+                                                    instanceStatus: 'connected',
+                                                    serverUrl: formData.serverUrl,
+                                                    instanceToken: formData.instanceToken
+                                                });
+                                            } else {
+                                                handleGenerateQRCode();
+                                            }
+                                        }}
+                                        disabled={!instancePhone}
+                                        className="w-full py-3 bg-emerald-600 text-white font-bold rounded-lg shadow-lg shadow-emerald-600/20 hover:bg-emerald-700 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        {isLoadingQr ? (
+                                            <>
+                                                <Loader2 size={18} className="animate-spin" />
+                                                Gerando...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <QrCode size={18} />
+                                                Gerar QR Code / Salvar
+                                            </>
+                                        )}
+                                    </button>
+
+                                    {/* QR Code Display Area */}
+                                    <div className="mt-6 border-2 border-dashed border-gray-200 rounded-xl min-h-[250px] flex flex-col items-center justify-center bg-gray-50/50 relative overflow-hidden">
+                                        {qrCodeImage ? (
+                                            <div className="p-4 bg-white rounded-lg shadow-sm">
+                                                <img src={qrCodeImage} alt="QR Code WhatsApp" className="w-56 h-56 object-contain" />
+                                                <p className="text-center text-xs text-emerald-600 font-medium mt-2">Escaneie com seu WhatsApp</p>
                                             </div>
-                                            <h3 className="font-bold text-slate-800 text-lg">Comercial</h3>
-                                            <p className="text-xs text-slate-400 font-semibold tracking-wider uppercase">Grupo Ascel</p>
-                                        </div>
+                                        ) : (
+                                            <div className="text-center text-gray-400 p-6">
+                                                <QrCode size={48} className="mx-auto mb-3 opacity-20" />
+                                                <p className="text-sm font-medium">Nenhum QR Code gerado</p>
+                                                <p className="text-xs mt-1 max-w-[200px] mx-auto opacity-70">Preencha os dados acima e clique em "Salvar" para conectar.</p>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
-                            </div>
-
-                            {/* Action Buttons */}
-                            <div className="grid grid-cols-1 gap-3">
-                                <button
-                                    onClick={() => document.querySelector('input[placeholder*="webhook/envio"]')?.focus()}
-                                    className="w-full py-3 bg-[#0284c7] text-white font-bold rounded-lg hover:bg-[#0369a1] transition-all shadow-lg shadow-sky-900/20 text-sm"
-                                >
-                                    Configurar Webhook
-                                </button>
-
-                                <button
-                                    onClick={async () => {
-                                        if (confirm('Tem certeza que deseja desconectar?')) {
-                                            onChange('instancePhone', '');
-                                            onChange('instanceStatus', 'disconnected');
-                                            await handleSaveSettings({
-                                                instancePhone: '',
-                                                instanceStatus: 'disconnected',
-                                                serverUrl: '',
-                                                instanceToken: ''
-                                            });
-                                        }
-                                    }}
-                                    className="w-full py-3 bg-[#1e293b] text-red-500 font-bold rounded-lg border border-red-900/30 hover:bg-red-950/20 hover:border-red-500/50 transition-all text-sm uppercase tracking-wide"
-                                >
-                                    Desconectar
-                                </button>
-                            </div>
-                        </div>
-                    ) : (
-                        // Disconnected State (Form)
-                        <div className="space-y-6">
-                            <div className="space-y-2">
-                                <label className="block text-sm font-medium text-gray-700">Telefone da Instância</label>
-                                <div className="relative">
-                                    <Smartphone size={16} className="absolute left-3 top-3 text-gray-400" />
-                                    <input
-                                        type="tel"
-                                        className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all"
-                                        placeholder="551199999999"
-                                        value={instancePhone}
-                                        onChange={(e) => setInstancePhone(e.target.value)}
-                                    />
-                                </div>
-                                <p className="text-xs text-gray-500">
-                                    Informe o número conectado para gerar o QR Code de sessão.
-                                </p>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2 duration-500 hidden">
-                                    {/* Manual inputs hidden in favor of easy link paste on left side */}
-                                </div>
-
-                                <button
-                                    onClick={async () => {
-                                        // If user wants to manually save without generating QR (for testing or if already connected)
-                                        if (instancePhone) {
-                                            onChange('instancePhone', instancePhone);
-                                            onChange('instanceStatus', 'connected');
-
-                                            // Explicitly pass manual inputs to override any auto-extraction
-                                            await handleSaveSettings({
-                                                instancePhone: instancePhone,
-                                                instanceStatus: 'connected',
-                                                serverUrl: formData.serverUrl,
-                                                instanceToken: formData.instanceToken
-                                            });
-                                        } else {
-                                            handleGenerateQRCode();
-                                        }
-                                    }}
-                                    disabled={!instancePhone}
-                                    className="w-full py-3 bg-emerald-600 text-white font-bold rounded-lg shadow-lg shadow-emerald-600/20 hover:bg-emerald-700 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    {isLoadingQr ? (
-                                        <>
-                                            <Loader2 size={18} className="animate-spin" />
-                                            Gerando...
-                                        </>
-                                    ) : (
-                                        <>
-                                            <QrCode size={18} />
-                                            Gerar QR Code / Salvar
-                                        </>
-                                    )}
-                                </button>
-
-                                {/* QR Code Display Area */}
-                                <div className="mt-6 border-2 border-dashed border-gray-200 rounded-xl min-h-[250px] flex flex-col items-center justify-center bg-gray-50/50 relative overflow-hidden">
-                                    {qrCodeImage ? (
-                                        <div className="p-4 bg-white rounded-lg shadow-sm">
-                                            <img src={qrCodeImage} alt="QR Code WhatsApp" className="w-56 h-56 object-contain" />
-                                            <p className="text-center text-xs text-emerald-600 font-medium mt-2">Escaneie com seu WhatsApp</p>
-                                        </div>
-                                    ) : (
-                                        <div className="text-center text-gray-400 p-6">
-                                            <QrCode size={48} className="mx-auto mb-3 opacity-20" />
-                                            <p className="text-sm font-medium">Nenhum QR Code gerado</p>
-                                            <p className="text-xs mt-1 max-w-[200px] mx-auto opacity-70">Preencha os dados acima e clique em "Salvar" para conectar.</p>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
                     )}
-                        </div>
+                            </div>
             </div>
 
-            </div>
-        </div >
-    );
+                </div>
+            </div >
+            );
 };
 
-export default SettingsPage;
+            export default SettingsPage;
