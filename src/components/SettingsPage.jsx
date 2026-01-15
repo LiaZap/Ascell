@@ -1,6 +1,6 @@
 import { Save, QrCode, Smartphone, Loader2 } from 'lucide-react';
 import { api } from '../services/api';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const SettingsPage = ({ formData, onChange, user }) => {
     const isAdmin = user?.role === 'Administrador';
