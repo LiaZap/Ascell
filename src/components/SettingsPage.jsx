@@ -275,25 +275,48 @@ const SettingsPage = ({ formData, onChange, user }) => {
                                                 let targetUrl = formData.serverUrl;
                                                 let headers = { 'Content-Type': 'application/json' };
 
-                                                // If we still have a separate token field or it's implicitly in the URL
                                                 if (formData.instanceToken) {
                                                     headers['token'] = formData.instanceToken;
                                                 }
 
                                                 console.log('Testing connection to:', targetUrl);
 
-                                                let response = await fetch(targetUrl, { method: 'GET', headers });
+                                                let response;
+                                                let data;
 
-                                                // If direct fetch fails (e.g. 404) and it doesn't look like a webhook (no 'webhook' in url), try appending endpoint
-                                                if (!response.ok && !targetUrl.includes('webhook')) {
-                                                    console.log('Direct fetch failed, trying /instance/status endpoint...');
-                                                    targetUrl = `${formData.serverUrl.replace(/\/$/, '')}/instance/status`;
+                                                try {
+                                                    // 1. Try Direct Method (Fastest)
                                                     response = await fetch(targetUrl, { method: 'GET', headers });
+
+                                                    // If direct fetch fails (e.g. 404) and it doesn't look like a webhook (no 'webhook' in url), try appending endpoint
+                                                    if (!response.ok && !targetUrl.includes('webhook')) {
+                                                        console.log('Direct fetch 404/Error, trying /instance/status endpoint...');
+                                                        targetUrl = `${formData.serverUrl.replace(/\/$/, '')}/instance/status`;
+                                                        response = await fetch(targetUrl, { method: 'GET', headers });
+                                                    }
+
+                                                    if (!response.ok) throw new Error(`Direct Error: ${response.status}`);
+                                                    data = await response.json();
+
+                                                } catch (directError) {
+                                                    console.warn('Direct fetch failed (likely CORS), trying Backend Proxy...', directError);
+
+                                                    // 2. Fallback to Backend Proxy (Bypasses CORS)
+                                                    const proxyResponse = await fetch('/api/proxy-check', {
+                                                        method: 'POST',
+                                                        headers: { 'Content-Type': 'application/json' },
+                                                        body: JSON.stringify({ url: targetUrl, token: formData.instanceToken })
+                                                    });
+
+                                                    if (!proxyResponse.ok) throw new Error('Proxy unreachable');
+
+                                                    const proxyResult = await proxyResponse.json();
+                                                    if (!proxyResult.ok) throw new Error(`Proxy Error: ${proxyResult.status}`);
+
+                                                    data = proxyResult.data;
                                                 }
 
-                                                if (!response.ok) throw new Error(`Erro API: ${response.status}`);
-                                                const data = await response.json();
-                                                console.log('Response:', data);
+                                                console.log('Final Response Data:', data);
 
                                                 // Accept different "connected" states
                                                 const isConnected = data && (

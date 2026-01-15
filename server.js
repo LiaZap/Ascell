@@ -93,7 +93,7 @@ initDb();
 app.use(cors());
 app.use(express.json());
 
-// 4. Proxy for WhatsApp Status
+// 4. Proxy for WhatsApp Status (Legacy DB lookup)
 app.get('/api/whatsapp/status', async (req, res) => {
     try {
         const client = await pool.connect();
@@ -120,17 +120,45 @@ app.get('/api/whatsapp/status', async (req, res) => {
         });
 
         if (!response.ok) {
-            // If the external API errors (e.g. 401 Unauthorized), we treat as disconnected
             return res.json({ status: 'disconnected', reason: 'api_error' });
         }
 
         const data = await response.json();
-        // Forward the data from the API (usually { instance: { status: 'open' } } or similar)
         res.json(data);
 
     } catch (err) {
         console.error('Error proxying status check:', err);
         res.status(500).json({ error: 'Failed to check status' });
+    }
+});
+
+// 4.1 Generic Proxy Check (For testing connections without CORS from frontend)
+app.post('/api/proxy-check', async (req, res) => {
+    const { url, token } = req.body;
+
+    if (!url) {
+        return res.status(400).json({ error: 'URL is required' });
+    }
+
+    try {
+        const headers = { 'Content-Type': 'application/json' };
+        if (token) headers['token'] = token;
+
+        console.log('Proxying request to:', url);
+        const response = await fetch(url, { method: 'GET', headers });
+
+        // We return the status and data regardless of 200 OK, so frontend can handle it
+        const data = await response.json().catch(() => ({})); // Handle non-json responses elegantly
+
+        res.json({
+            ok: response.ok,
+            status: response.status,
+            data: data
+        });
+
+    } catch (err) {
+        console.error('Proxy check failed:', err);
+        res.status(500).json({ error: 'Failed to fetch URL via proxy: ' + err.message });
     }
 });
 
