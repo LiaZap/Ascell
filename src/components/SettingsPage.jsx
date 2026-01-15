@@ -7,6 +7,7 @@ const SettingsPage = ({ formData, onChange, user }) => {
     const [instancePhone, setInstancePhone] = useState('');
     const [qrCodeImage, setQrCodeImage] = useState(null);
     const [isLoadingQr, setIsLoadingQr] = useState(false);
+    const [realStatus, setRealStatus] = useState('checking');
 
     const handleSaveSettings = async (updates = {}) => {
         // Automatic Extraction Logic
