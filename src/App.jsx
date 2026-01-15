@@ -45,7 +45,11 @@ const INITIAL_FORM_STATE = {
 
   // Webhook
   webhookUrl: localStorage.getItem('webhookUrl') || '',
-  qrWebhookUrl: localStorage.getItem('qrWebhookUrl') || ''
+  qrWebhookUrl: localStorage.getItem('qrWebhookUrl') || '',
+
+  // WhatsApp Instance
+  instancePhone: localStorage.getItem('instancePhone') || '',
+  instanceStatus: localStorage.getItem('instanceStatus') || 'disconnected'
 };
 
 const generateProtocol = () => {
@@ -154,7 +158,9 @@ function App() {
   useEffect(() => {
     localStorage.setItem('webhookUrl', formData.webhookUrl);
     localStorage.setItem('qrWebhookUrl', formData.qrWebhookUrl);
-  }, [formData.webhookUrl, formData.qrWebhookUrl]);
+    localStorage.setItem('instancePhone', formData.instancePhone);
+    localStorage.setItem('instanceStatus', formData.instanceStatus);
+  }, [formData.webhookUrl, formData.qrWebhookUrl, formData.instancePhone, formData.instanceStatus]);
 
   // Sync Agent Name with Current User
   useEffect(() => {

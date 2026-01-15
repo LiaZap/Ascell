@@ -261,12 +261,21 @@ app.delete('/api/users/:id', async (req, res) => {
 // 7. Get Settings
 app.get('/api/settings', async (req, res) => {
     try {
-        const result = await pool.query('SELECT value FROM settings WHERE key = $1', ['webhookUrl']);
-        if (result.rows.length > 0) {
-            res.json({ webhookUrl: result.rows[0].value });
-        } else {
-            res.json({ webhookUrl: '' });
-        }
+        const result = await pool.query('SELECT key, value FROM settings');
+
+        // Convert rows [{key, value}] to object {key: value}
+        const settings = result.rows.reduce((acc, row) => {
+            acc[row.key] = row.value;
+            return acc;
+        }, {});
+
+        // Return with defaults if missing
+        res.json({
+            webhookUrl: settings.webhookUrl || '',
+            qrWebhookUrl: settings.qrWebhookUrl || '',
+            instancePhone: settings.instancePhone || '',
+            instanceStatus: settings.instanceStatus || 'disconnected'
+        });
     } catch (err) {
         console.error('Error fetching settings:', err);
         res.status(500).json({ error: 'Failed to fetch settings' });
@@ -275,16 +284,30 @@ app.get('/api/settings', async (req, res) => {
 
 // 8. Update Settings
 app.put('/api/settings', async (req, res) => {
-    const { webhookUrl } = req.body;
+    const settings = req.body; // Expect object with keys
+    const client = await pool.connect();
+
     try {
-        await pool.query(
-            'INSERT INTO settings (key, value) VALUES ($1, $2) ON CONFLICT (key) DO UPDATE SET value = $2',
-            ['webhookUrl', webhookUrl]
-        );
+        await client.query('BEGIN');
+
+        for (const [key, value] of Object.entries(settings)) {
+            // Only allow specific keys for safety
+            if (['webhookUrl', 'qrWebhookUrl', 'instancePhone', 'instanceStatus'].includes(key)) {
+                await client.query(
+                    'INSERT INTO settings (key, value) VALUES ($1, $2) ON CONFLICT (key) DO UPDATE SET value = $2',
+                    [key, String(value)]
+                );
+            }
+        }
+
+        await client.query('COMMIT');
         res.json({ message: 'Settings updated successfully' });
     } catch (err) {
+        await client.query('ROLLBACK');
         console.error('Error updating settings:', err);
         res.status(500).json({ error: 'Failed to update settings' });
+    } finally {
+        client.release();
     }
 });
 

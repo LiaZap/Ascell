@@ -75,7 +75,10 @@ export const api = {
     // Settings
     getSettings: async () => {
         try {
-            const response = await fetch(`${API_URL}/settings`);
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${API_URL}/settings`, {
+                headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+            });
             if (!response.ok) throw new Error('Failed to fetch settings');
             return await response.json();
         } catch (error) {
