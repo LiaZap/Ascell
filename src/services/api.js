@@ -32,6 +32,26 @@ export const api = {
         }
     },
 
+    createLog: async (logData) => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${API_URL}/logs`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+                },
+                body: JSON.stringify(logData)
+            });
+            if (!response.ok) throw new Error('Failed to create log');
+            return await response.json();
+        } catch (error) {
+            console.error('API Error:', error);
+            // Non-blocking error
+            return null;
+        }
+    },
+
     // Users
     getUsers: async () => {
         try {

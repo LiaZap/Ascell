@@ -10,25 +10,12 @@ const LogsPage = () => {
         const fetchLogs = async () => {
             try {
                 const data = await api.getLogs();
-                // If API returns empty (e.g. dev mode without backend), revert to mock for demo purposes if needed, 
-                // but strictly we should use what the API gives.
-                // For this transition, if empty, let's keep it empty or user will be confused why DB isn't writing.
-                // Actually to not break the UI flow, let's set mock if data is empty ONLY for Dev
-                if (data && data.length > 0) {
+                // Strictly use what the API gives to ensure synchronization across all users.
+                // If the DB is empty, everyone should see empty (or just the new logs as they come in).
+                if (data) {
                     setLogs(data);
                 } else {
-                    // Sync with LocalStorage Logs (Created by DashboardForm)
-                    const localLogs = JSON.parse(localStorage.getItem('app_logs') || '[]');
-
-                    if (localLogs.length > 0) {
-                        setLogs(localLogs);
-                    } else {
-                        // Fallback Mock only if empty
-                        setLogs([
-                            { id: 1, date: '13/01/2026 10:45', agent: 'Maria Silva', client: 'João Souza', type: 'Lembrete', status: 'Enviado', protocol: 'ASC-8821' },
-                            { id: 2, date: '13/01/2026 10:30', agent: 'Carlos Oliveira', client: 'Ana Paula', type: 'Certificado', status: 'Enviado', protocol: 'ASC-8820' },
-                        ]);
-                    }
+                    setLogs([]);
                 }
             } catch (error) {
                 console.error("Failed to load logs", error);

@@ -138,16 +138,25 @@ app.get('/api/setup', async (req, res) => {
 // 1. Get Logs
 app.get('/api/logs', async (req, res) => {
     try {
-        // Check if table exists, if not return mock/empty to avoid crash on fresh deploy
-        // In production, you'd run migrations. Here we'll just try to query.
         const result = await pool.query('SELECT * FROM logs ORDER BY created_at DESC LIMIT 100');
         res.json(result.rows);
     } catch (err) {
         console.error('Error fetching logs:', err);
-        // Fallback Mock Data for Demo if DB fails or is empty
-        res.json([
-            { id: 1, date: '13/01/2026 10:45', agent: 'Sistema', client: 'Exemplo Falha Conexão DB', type: 'Alerta', status: 'Erro', protocol: 'ERR-001' }
-        ]);
+        res.json([]);
+    }
+});
+
+app.post('/api/logs', async (req, res) => {
+    const { date, agent, client, type, status, protocol } = req.body;
+    try {
+        const result = await pool.query(
+            'INSERT INTO logs (date, agent, client, type, status, protocol) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+            [new Date(), agent, client, type, status, protocol]
+        );
+        res.json(result.rows[0]);
+    } catch (err) {
+        console.error('Error creating log:', err);
+        res.status(500).json({ error: 'Failed to create log' });
     }
 });
 

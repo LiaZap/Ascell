@@ -1,6 +1,7 @@
 import { Calendar, Clock, Link as LinkIcon, User, Settings, HelpCircle, FileText, CheckCircle, Video, Shield, Loader2, AlertCircle, XCircle, RefreshCcw } from 'lucide-react';
 import { MEETING_TEMPLATES, CERTIFICATE_TEMPLATES } from '../data/templates';
 import { useState, useEffect } from 'react';
+import { api } from '../services/api';
 
 const DashboardForm = ({ formData, onChange, onGenerateProtocol }) => {
     const [isSending, setIsSending] = useState(false);
@@ -112,19 +113,24 @@ const DashboardForm = ({ formData, onChange, onGenerateProtocol }) => {
             if (response.ok) {
                 showToast(`Enviado com sucesso! (${usedTemplateName})`, 'success');
 
-                // Save Log to LocalStorage for Sync
+                // Save Log to Backend for Sync
                 const newLog = {
-                    id: Date.now(),
                     protocol: formData.protocolCode,
-                    date: new Date().toLocaleString('pt-BR'),
+                    date: new Date().toISOString(),
                     agent: formData.agentName || 'Sistema',
                     client: formData.clientName || 'Cliente',
                     type: formData.messageType === 'meeting' ? 'Lembrete' : 'Certificado',
                     status: 'Enviado'
                 };
 
+                // Fire and forget log creation
+                api.createLog(newLog).then(() => {
+                    console.log('Log synced to backend');
+                }).catch(err => console.error('Log sync failed', err));
+
+                // Save to LocalStorage as backup (Optional, keeping for immediate feedback if offline)
                 const existingLogs = JSON.parse(localStorage.getItem('app_logs') || '[]');
-                localStorage.setItem('app_logs', JSON.stringify([newLog, ...existingLogs]));
+                localStorage.setItem('app_logs', JSON.stringify([{ ...newLog, id: Date.now() }, ...existingLogs]));
 
             } else {
                 const errorText = await response.text();
