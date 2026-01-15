@@ -214,7 +214,7 @@ function App() {
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
-                  <StatusIndicator />
+                  <StatusIndicator isConnected={!!formData.webhookUrl} />
                 </div>
               </div>
             </header>
