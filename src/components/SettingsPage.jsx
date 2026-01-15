@@ -449,69 +449,69 @@ const SettingsPage = ({ formData, onChange, user }) => {
                                     <p className="text-xs text-gray-500">
                                         Informe o número conectado para gerar o QR Code de sessão.
                                     </p>
-                                    </p>
-                                </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2 duration-500 hidden">
-                                        {/* Manual inputs hidden in favor of easy link paste on left side */}
-                                    </div>
 
-                                    <button
-                                        onClick={async () => {
-                                            // If user wants to manually save without generating QR (for testing or if already connected)
-                                            if (instancePhone) {
-                                                onChange('instancePhone', instancePhone);
-                                                onChange('instanceStatus', 'connected');
-
-                                                // Explicitly pass manual inputs to override any auto-extraction
-                                                await handleSaveSettings({
-                                                    instancePhone: instancePhone,
-                                                    instanceStatus: 'connected',
-                                                    serverUrl: formData.serverUrl,
-                                                    instanceToken: formData.instanceToken
-                                                });
-                                            } else {
-                                                handleGenerateQRCode();
-                                            }
-                                        }}
-                                        disabled={!instancePhone}
-                                        className="w-full py-3 bg-emerald-600 text-white font-bold rounded-lg shadow-lg shadow-emerald-600/20 hover:bg-emerald-700 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                                    >
-                                        {isLoadingQr ? (
-                                            <>
-                                                <Loader2 size={18} className="animate-spin" />
-                                                Gerando...
-                                            </>
-                                        ) : (
-                                            <>
-                                                <QrCode size={18} />
-                                                Gerar QR Code / Salvar
-                                            </>
-                                        )}
-                                    </button>
-
-                                    {/* QR Code Display Area */}
-                        <div className="mt-6 border-2 border-dashed border-gray-200 rounded-xl min-h-[250px] flex flex-col items-center justify-center bg-gray-50/50 relative overflow-hidden">
-                            {qrCodeImage ? (
-                                <div className="p-4 bg-white rounded-lg shadow-sm">
-                                    <img src={qrCodeImage} alt="QR Code WhatsApp" className="w-56 h-56 object-contain" />
-                                    <p className="text-center text-xs text-emerald-600 font-medium mt-2">Escaneie com seu WhatsApp</p>
                                 </div>
-                            ) : (
-                                <div className="text-center text-gray-400 p-6">
-                                    <QrCode size={48} className="mx-auto mb-3 opacity-20" />
-                                    <p className="text-sm font-medium">Nenhum QR Code gerado</p>
-                                    <p className="text-xs mt-1 max-w-[200px] mx-auto opacity-70">Preencha os dados acima e clique em "Salvar" para conectar.</p>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2 duration-500 hidden">
+                                    {/* Manual inputs hidden in favor of easy link paste on left side */}
                                 </div>
-                            )}
-                        </div>
+
+                                <button
+                                    onClick={async () => {
+                                        // If user wants to manually save without generating QR (for testing or if already connected)
+                                        if (instancePhone) {
+                                            onChange('instancePhone', instancePhone);
+                                            onChange('instanceStatus', 'connected');
+
+                                            // Explicitly pass manual inputs to override any auto-extraction
+                                            await handleSaveSettings({
+                                                instancePhone: instancePhone,
+                                                instanceStatus: 'connected',
+                                                serverUrl: formData.serverUrl,
+                                                instanceToken: formData.instanceToken
+                                            });
+                                        } else {
+                                            handleGenerateQRCode();
+                                        }
+                                    }}
+                                    disabled={!instancePhone}
+                                    className="w-full py-3 bg-emerald-600 text-white font-bold rounded-lg shadow-lg shadow-emerald-600/20 hover:bg-emerald-700 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    {isLoadingQr ? (
+                                        <>
+                                            <Loader2 size={18} className="animate-spin" />
+                                            Gerando...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <QrCode size={18} />
+                                            Gerar QR Code / Salvar
+                                        </>
+                                    )}
+                                </button>
+
+                                {/* QR Code Display Area */}
+                                <div className="mt-6 border-2 border-dashed border-gray-200 rounded-xl min-h-[250px] flex flex-col items-center justify-center bg-gray-50/50 relative overflow-hidden">
+                                    {qrCodeImage ? (
+                                        <div className="p-4 bg-white rounded-lg shadow-sm">
+                                            <img src={qrCodeImage} alt="QR Code WhatsApp" className="w-56 h-56 object-contain" />
+                                            <p className="text-center text-xs text-emerald-600 font-medium mt-2">Escaneie com seu WhatsApp</p>
+                                        </div>
+                                    ) : (
+                                        <div className="text-center text-gray-400 p-6">
+                                            <QrCode size={48} className="mx-auto mb-3 opacity-20" />
+                                            <p className="text-sm font-medium">Nenhum QR Code gerado</p>
+                                            <p className="text-xs mt-1 max-w-[200px] mx-auto opacity-70">Preencha os dados acima e clique em "Salvar" para conectar.</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
                     </div>
-                    )}
                 </div>
-            </div>
 
-        </div>
-            </div >
-            );
+            </div>
+        </div >
+    );
 };
 
 export default SettingsPage;
