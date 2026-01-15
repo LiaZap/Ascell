@@ -64,10 +64,19 @@ function App() {
     // Lazy init to ensure localStorage is read at mount time, avoiding module caching issues
     const savedUrl = localStorage.getItem('webhookUrl') || '';
     const savedQrUrl = localStorage.getItem('qrWebhookUrl') || '';
+    const savedServerUrl = localStorage.getItem('serverUrl') || '';
+    const savedToken = localStorage.getItem('instanceToken') || '';
+    const savedPhone = localStorage.getItem('instancePhone') || '';
+    const savedStatus = localStorage.getItem('instanceStatus') || 'disconnected';
+
     return {
       ...INITIAL_FORM_STATE,
       webhookUrl: savedUrl,
-      qrWebhookUrl: savedQrUrl
+      qrWebhookUrl: savedQrUrl,
+      serverUrl: savedServerUrl,
+      instanceToken: savedToken,
+      instancePhone: savedPhone,
+      instanceStatus: savedStatus
     };
   });
   const [isAuthenticated, setIsAuthenticated] = useState(false);
