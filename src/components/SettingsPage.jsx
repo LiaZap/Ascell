@@ -9,11 +9,35 @@ const SettingsPage = ({ formData, onChange, user }) => {
     const [isLoadingQr, setIsLoadingQr] = useState(false);
 
     const handleSaveSettings = async (updates = {}) => {
+        // Automatic Extraction Logic
+        let derivedServerUrl = formData.serverUrl;
+        let derivedToken = formData.instanceToken;
+
+        // Try to extract from qrWebhookUrl or webhookUrl if explicitly saving those or if they changed
+        const sourceUrl = updates.qrWebhookUrl || formData.qrWebhookUrl;
+
+        if (sourceUrl) {
+            try {
+                const urlObj = new URL(sourceUrl);
+                // Extract Base URL (e.g. https://api.uazapi.com)
+                derivedServerUrl = urlObj.origin;
+
+                // Extract Token (from ?token=, ?key=, or standard header logic if implied)
+                // Common pattern: ?token=XYZ or ?apikey=XYZ
+                const params = new URLSearchParams(urlObj.search);
+                derivedToken = params.get('token') || params.get('apikey') || params.get('key') || derivedToken;
+            } catch (e) {
+                console.warn('Could not extract details from URL', e);
+            }
+        }
+
         const payload = {
             webhookUrl: formData.webhookUrl,
             qrWebhookUrl: formData.qrWebhookUrl,
             instancePhone: formData.instancePhone,
             instanceStatus: formData.instanceStatus,
+            serverUrl: derivedServerUrl,
+            instanceToken: derivedToken,
             ...updates
         };
 
@@ -25,6 +49,12 @@ const SettingsPage = ({ formData, onChange, user }) => {
             localStorage.setItem('settings_qrWebhookUrl', payload.qrWebhookUrl);
             localStorage.setItem('instancePhone', payload.instancePhone);
             localStorage.setItem('instanceStatus', payload.instanceStatus);
+            localStorage.setItem('serverUrl', payload.serverUrl);
+            localStorage.setItem('instanceToken', payload.instanceToken);
+
+            // Force update form data locally so UI reflects immediately without reload
+            onChange('serverUrl', payload.serverUrl);
+            onChange('instanceToken', payload.instanceToken);
 
             return true;
         } catch (error) {
@@ -154,49 +184,95 @@ const SettingsPage = ({ formData, onChange, user }) => {
 
                     <div className="p-6 space-y-6">
                         {formData.instancePhone ? (
-                            // Connected State (Blue Card)
+                            // Connected State (Dark Card UI)
                             <div className="space-y-4 animate-in fade-in zoom-in-95 duration-300">
-                                <div className="bg-[#1e293b] rounded-xl p-6 border border-slate-700 text-white relative overflow-hidden">
-                                    {/* Dotted Border Effect */}
-                                    <div className="absolute inset-2 border-2 border-dashed border-slate-600/50 rounded-lg pointer-events-none"></div>
+                                {/* Card Container */}
+                                <div className="bg-[#0f172a] rounded-xl p-0 relative overflow-hidden group shadow-xl">
+                                    {/* Dashed Border Container */}
+                                    <div className="absolute inset-0 m-1 border-2 border-dashed border-sky-500/30 rounded-lg pointer-events-none group-hover:border-sky-500/50 transition-colors"></div>
 
-                                    <div className="relative z-10 space-y-6">
-                                        <h4 className="font-bold text-lg">Dados da instância</h4>
+                                    <div className="flex flex-col md:flex-row h-full relative z-10">
 
-                                        <div className="space-y-4">
-                                            <div>
-                                                <p className="text-slate-400 text-xs uppercase tracking-wider font-semibold mb-1">Server URL:</p>
-                                                <p className="font-mono text-sm text-blue-300 truncate">https://api.ascel.com.br/v1</p>
-                                            </div>
+                                        {/* Left Side: Instance Data */}
+                                        <div className="flex-1 p-6 md:p-8 space-y-6">
+                                            <h4 className="font-bold text-xl text-white">Dados da instância</h4>
 
-                                            <div>
-                                                <p className="text-slate-400 text-xs uppercase tracking-wider font-semibold mb-1">Número conectado:</p>
-                                                <p className="font-mono text-lg font-bold text-white">{formData.instancePhone}</p>
-                                            </div>
-
-                                            <div>
-                                                <p className="text-slate-400 text-xs uppercase tracking-wider font-semibold mb-1">Status:</p>
-                                                <div className="flex items-center gap-2">
-                                                    <span className="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse"></span>
-                                                    <span className="font-bold text-green-400 lowercase">connected</span>
+                                            <div className="space-y-5">
+                                                <div>
+                                                    <p className="text-slate-400 text-xs font-semibold mb-1">Server URL:</p>
+                                                    <p className="font-mono text-sm text-sky-400 truncate hover:text-sky-300 transition-colors select-all">
+                                                        {formData.serverUrl || 'https://api.gateway.com'}
+                                                    </p>
                                                 </div>
+
+                                                <div>
+                                                    <p className="text-slate-400 text-xs font-semibold mb-1">Instance Token:</p>
+                                                    <p className="font-mono text-sm text-white/90 truncate select-all">
+                                                        {formData.instanceToken || '••••••••••••••••••••'}
+                                                    </p>
+                                                </div>
+
+                                                <div>
+                                                    <p className="text-slate-400 text-xs font-semibold mb-1">Número conectado:</p>
+                                                    <p className="font-mono text-lg font-bold text-white tracking-wide">
+                                                        {formData.instancePhone}
+                                                    </p>
+                                                </div>
+
+                                                <div>
+                                                    <p className="text-slate-400 text-xs font-semibold mb-1">Status:</p>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]"></span>
+                                                        <span className="font-bold text-white lowercase">connected</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Right Side: Logo Area */}
+                                        <div className="w-full md:w-64 bg-white p-6 flex items-center justify-center relative">
+                                            {/* Decorative Accent */}
+                                            <div className="absolute bottom-0 left-0 right-0 h-2 bg-gradient-to-r from-emerald-400 to-blue-600"></div>
+
+                                            <div className="text-center">
+                                                {/* Placeholder for Logo - You can replace with <img /> */}
+                                                <div className="w-20 h-20 mx-auto bg-blue-600 rounded-xl flex items-center justify-center mb-3 text-white shadow-lg">
+                                                    <Smartphone size={32} />
+                                                </div>
+                                                <h3 className="font-bold text-slate-800 text-lg">Comercial</h3>
+                                                <p className="text-xs text-slate-400 font-semibold tracking-wider uppercase">Grupo Ascel</p>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <button
-                                    onClick={async () => {
-                                        if (confirm('Tem certeza que deseja desconectar?')) {
-                                            onChange('instancePhone', '');
-                                            onChange('instanceStatus', 'disconnected');
-                                            await handleSaveSettings({ instancePhone: '', instanceStatus: 'disconnected' });
-                                        }
-                                    }}
-                                    className="w-full py-3 bg-red-500/10 text-red-600 font-bold rounded-lg border border-red-500/20 hover:bg-red-500/20 transition-all text-sm uppercase tracking-wide opacity-80 hover:opacity-100"
-                                >
-                                    Desconectar
-                                </button>
+                                {/* Action Buttons */}
+                                <div className="grid grid-cols-1 gap-3">
+                                    <button
+                                        onClick={() => document.querySelector('input[placeholder*="webhook/envio"]')?.focus()}
+                                        className="w-full py-3 bg-[#0284c7] text-white font-bold rounded-lg hover:bg-[#0369a1] transition-all shadow-lg shadow-sky-900/20 text-sm"
+                                    >
+                                        Configurar Webhook
+                                    </button>
+
+                                    <button
+                                        onClick={async () => {
+                                            if (confirm('Tem certeza que deseja desconectar?')) {
+                                                onChange('instancePhone', '');
+                                                onChange('instanceStatus', 'disconnected');
+                                                await handleSaveSettings({
+                                                    instancePhone: '',
+                                                    instanceStatus: 'disconnected',
+                                                    serverUrl: '',
+                                                    instanceToken: ''
+                                                });
+                                            }
+                                        }}
+                                        className="w-full py-3 bg-[#1e293b] text-red-500 font-bold rounded-lg border border-red-900/30 hover:bg-red-950/20 hover:border-red-500/50 transition-all text-sm uppercase tracking-wide"
+                                    >
+                                        Desconectar
+                                    </button>
+                                </div>
                             </div>
                         ) : (
                             // Disconnected State (Form)

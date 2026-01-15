@@ -49,7 +49,9 @@ const INITIAL_FORM_STATE = {
 
   // WhatsApp Instance
   instancePhone: localStorage.getItem('instancePhone') || '',
-  instanceStatus: localStorage.getItem('instanceStatus') || 'disconnected'
+  instanceStatus: localStorage.getItem('instanceStatus') || 'disconnected',
+  serverUrl: localStorage.getItem('serverUrl') || '',
+  instanceToken: localStorage.getItem('instanceToken') || ''
 };
 
 const generateProtocol = () => {
@@ -104,7 +106,9 @@ function App() {
               webhookUrl: settings.webhookUrl || prev.webhookUrl,
               qrWebhookUrl: settings.qrWebhookUrl || prev.qrWebhookUrl,
               instancePhone: settings.instancePhone || prev.instancePhone,
-              instanceStatus: settings.instanceStatus || prev.instanceStatus
+              instanceStatus: settings.instanceStatus || prev.instanceStatus,
+              serverUrl: settings.serverUrl || prev.serverUrl,
+              instanceToken: settings.instanceToken || prev.instanceToken
             }));
 
             // Persist to local storage for persistence across reloads
@@ -112,6 +116,8 @@ function App() {
             if (settings.qrWebhookUrl) localStorage.setItem('qrWebhookUrl', settings.qrWebhookUrl);
             if (settings.instancePhone) localStorage.setItem('instancePhone', settings.instancePhone);
             if (settings.instanceStatus) localStorage.setItem('instanceStatus', settings.instanceStatus);
+            if (settings.serverUrl) localStorage.setItem('serverUrl', settings.serverUrl);
+            if (settings.instanceToken) localStorage.setItem('instanceToken', settings.instanceToken);
           }
         } catch (err) {
           console.error('Failed to load global settings', err);
@@ -166,7 +172,9 @@ function App() {
     localStorage.setItem('qrWebhookUrl', formData.qrWebhookUrl);
     localStorage.setItem('instancePhone', formData.instancePhone);
     localStorage.setItem('instanceStatus', formData.instanceStatus);
-  }, [formData.webhookUrl, formData.qrWebhookUrl, formData.instancePhone, formData.instanceStatus]);
+    localStorage.setItem('serverUrl', formData.serverUrl);
+    localStorage.setItem('instanceToken', formData.instanceToken);
+  }, [formData.webhookUrl, formData.qrWebhookUrl, formData.instancePhone, formData.instanceStatus, formData.serverUrl, formData.instanceToken]);
 
   // Sync Agent Name with Current User
   useEffect(() => {

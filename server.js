@@ -283,7 +283,9 @@ app.get('/api/settings', async (req, res) => {
             webhookUrl: settings.webhookUrl || '',
             qrWebhookUrl: settings.qrWebhookUrl || '',
             instancePhone: settings.instancePhone || '',
-            instanceStatus: settings.instanceStatus || 'disconnected'
+            instanceStatus: settings.instanceStatus || 'disconnected',
+            serverUrl: settings.serverUrl || '',
+            instanceToken: settings.instanceToken || ''
         });
     } catch (err) {
         console.error('Error fetching settings:', err);
@@ -301,7 +303,7 @@ app.put('/api/settings', async (req, res) => {
 
         for (const [key, value] of Object.entries(settings)) {
             // Only allow specific keys for safety
-            if (['webhookUrl', 'qrWebhookUrl', 'instancePhone', 'instanceStatus'].includes(key)) {
+            if (['webhookUrl', 'qrWebhookUrl', 'instancePhone', 'instanceStatus', 'serverUrl', 'instanceToken'].includes(key)) {
                 await client.query(
                     'INSERT INTO settings (key, value) VALUES ($1, $2) ON CONFLICT (key) DO UPDATE SET value = $2',
                     [key, String(value)]
