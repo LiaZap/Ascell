@@ -102,10 +102,16 @@ function App() {
             setFormData(prev => ({
               ...prev,
               webhookUrl: settings.webhookUrl || prev.webhookUrl,
-              qrWebhookUrl: settings.qrWebhookUrl || prev.qrWebhookUrl
+              qrWebhookUrl: settings.qrWebhookUrl || prev.qrWebhookUrl,
+              instancePhone: settings.instancePhone || prev.instancePhone,
+              instanceStatus: settings.instanceStatus || prev.instanceStatus
             }));
+
+            // Persist to local storage for persistence across reloads
             if (settings.webhookUrl) localStorage.setItem('webhookUrl', settings.webhookUrl);
             if (settings.qrWebhookUrl) localStorage.setItem('qrWebhookUrl', settings.qrWebhookUrl);
+            if (settings.instancePhone) localStorage.setItem('instancePhone', settings.instancePhone);
+            if (settings.instanceStatus) localStorage.setItem('instanceStatus', settings.instanceStatus);
           }
         } catch (err) {
           console.error('Failed to load global settings', err);
@@ -220,7 +226,7 @@ function App() {
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
-                  <StatusIndicator isConnected={!!formData.webhookUrl} />
+                  <StatusIndicator isConnected={formData.instanceStatus === 'connected'} />
                 </div>
               </div>
             </header>
