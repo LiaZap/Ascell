@@ -343,12 +343,15 @@ const SettingsPage = ({ formData, onChange, user }) => {
                                                 const result = await performConnectionCheck(formData.serverUrl, formData.instanceToken);
 
                                                 if (result.success) {
-                                                    const data = result.data;
-                                                    console.log('Manual Verify Response:', data);
+                                                    const rawData = result.data;
+                                                    console.log('Manual Verify Response:', rawData);
+
+                                                    // Handle n8n Array Response
+                                                    const data = Array.isArray(rawData) ? rawData[0] : rawData;
 
                                                     const isConnected = data && (
                                                         (data.instance && (data.instance.status === 'open' || data.instance.status === 'connected')) ||
-                                                        (data.status === 'connected') ||
+                                                        (data.status && (data.status === 'connected' || data.status.connected === true)) ||
                                                         (data.connected === true)
                                                     );
 
