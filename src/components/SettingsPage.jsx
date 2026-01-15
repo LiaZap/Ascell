@@ -12,20 +12,40 @@ const SettingsPage = ({ formData, onChange, user }) => {
     // Auto-check connection on mount
     useEffect(() => {
         const autoCheck = async () => {
+            if (!formData.serverUrl) return; // Need a URL to check
+
             try {
-                const data = await api.getConnectionStatus();
-                console.log('Auto-check response:', data); // Debug for user
+                let targetUrl = formData.serverUrl;
+                let headers = { 'Content-Type': 'application/json' };
+                if (formData.instanceToken) headers['token'] = formData.instanceToken;
 
-                if (data && data.instance && (data.instance.status === 'open' || data.instance.status === 'connected')) {
+                // Debug check type
+                console.log('Auto-check URL:', targetUrl);
 
-                    // Connected! Update status
-                    onChange('instanceStatus', 'connected');
+                let response = await fetch(targetUrl, { method: 'GET', headers });
 
-                    // Auto-fill phone if available in response
-                    const remotePhone = data.instance.owner?.split('@')[0];
-                    if (remotePhone) {
-                        setInstancePhone(remotePhone); // Update local state
-                        onChange('instancePhone', remotePhone); // Update global/form state
+                // Fallback for legacy API URLs if direct failed
+                if (!response.ok && !targetUrl.includes('webhook')) {
+                    targetUrl = `${formData.serverUrl.replace(/\/$/, '')}/instance/status`;
+                    response = await fetch(targetUrl, { method: 'GET', headers });
+                }
+
+                if (response.ok) {
+                    const data = await response.json();
+
+                    // Robust check for various API formats
+                    const isConnected = data && (
+                        (data.instance && (data.instance.status === 'open' || data.instance.status === 'connected')) ||
+                        (data.status === 'connected') ||
+                        (data.connected === true)
+                    );
+
+                    if (isConnected) {
+                        onChange('instanceStatus', 'connected');
+                        // Optional: update phone if it drifted
+                        const remotePhone = (data.instance && data.instance.owner?.split('@')[0]) ||
+                            (data.owner?.split('@')[0]);
+                        if (remotePhone) onChange('instancePhone', remotePhone);
                     }
                 }
             } catch (err) {
@@ -33,7 +53,7 @@ const SettingsPage = ({ formData, onChange, user }) => {
             }
         };
         autoCheck();
-    }, []);
+    }, [formData.serverUrl]); // Re-run if serverUrl changes (e.g. valid load)
 
     const handleSaveSettings = async (updates = {}) => {
         // Automatic Extraction Logic
@@ -233,69 +253,82 @@ const SettingsPage = ({ formData, onChange, user }) => {
 
 
                             <div className="space-y-2 border-t border-gray-100 pt-4 mt-4">
-                                <label className="block text-sm font-medium text-blue-700">Link de Conexão da Instância (API)</label>
+                                <label className="block text-sm font-medium text-blue-700">Webhook de Status (Conexão)</label>
                                 <div className="relative flex gap-2">
                                     <input
                                         type="url"
                                         className="w-full px-4 py-2.5 bg-blue-50 border border-blue-100 rounded-lg text-sm text-gray-600 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all font-mono"
-                                        placeholder="Cole o link completo da API aqui..."
-                                        value={formData.connectionLink || ''}
-                                        onChange={(e) => onChange('connectionLink', e.target.value)}
+                                        placeholder="https://n8n.../webhook/status-check"
+                                        value={formData.serverUrl || ''} // Bind directly to serverUrl for auto-save
+                                        onChange={(e) => onChange('serverUrl', e.target.value)}
                                     />
                                     <button
                                         onClick={async () => {
-                                            if (!formData.connectionLink) {
-                                                alert('Cole o link da API para verificar.');
+                                            if (!formData.serverUrl) {
+                                                alert('Cole o Webhook ou URL da API para verificar.');
                                                 return;
                                             }
 
                                             setIsLoadingQr(true);
                                             try {
-                                                const urlObj = new URL(formData.connectionLink);
-                                                const extractedServerUrl = urlObj.origin;
-                                                const params = new URLSearchParams(urlObj.search);
-                                                const extractedToken = params.get('token') || params.get('apikey') || params.get('key');
+                                                // Verification Logic: Try Full URL first (Webhook mode), then Base URL mode
+                                                let targetUrl = formData.serverUrl;
+                                                let headers = { 'Content-Type': 'application/json' };
 
-                                                if (!extractedToken) {
-                                                    throw new Error('Não foi possível encontrar o Token no link. Verifique se o link tem ?token=...');
+                                                // If we still have a separate token field or it's implicitly in the URL
+                                                if (formData.instanceToken) {
+                                                    headers['token'] = formData.instanceToken;
                                                 }
 
-                                                // Test Connection
-                                                const statusUrl = `${extractedServerUrl}/instance/status`;
-                                                console.log('Testing connection to:', statusUrl);
+                                                console.log('Testing connection to:', targetUrl);
 
-                                                const response = await fetch(statusUrl, {
-                                                    method: 'GET',
-                                                    headers: {
-                                                        'token': extractedToken,
-                                                        'Content-Type': 'application/json'
-                                                    }
-                                                });
+                                                let response = await fetch(targetUrl, { method: 'GET', headers });
+
+                                                // If direct fetch fails (e.g. 404) and it doesn't look like a webhook (no 'webhook' in url), try appending endpoint
+                                                if (!response.ok && !targetUrl.includes('webhook')) {
+                                                    console.log('Direct fetch failed, trying /instance/status endpoint...');
+                                                    targetUrl = `${formData.serverUrl.replace(/\/$/, '')}/instance/status`;
+                                                    response = await fetch(targetUrl, { method: 'GET', headers });
+                                                }
 
                                                 if (!response.ok) throw new Error(`Erro API: ${response.status}`);
                                                 const data = await response.json();
+                                                console.log('Response:', data);
 
-                                                if (data && data.instance && (data.instance.status === 'open' || data.instance.status === 'connected')) {
+                                                // Accept different "connected" states
+                                                const isConnected = data && (
+                                                    (data.instance && (data.instance.status === 'open' || data.instance.status === 'connected')) ||
+                                                    (data.status === 'connected') ||
+                                                    (data.connected === true)
+                                                );
+
+                                                if (isConnected) {
                                                     alert('✅ Conexão Confirmada! Configurando sistema...');
 
-                                                    const remotePhone = data.instance.owner?.split('@')[0] || instancePhone;
+                                                    // Extract phone if available (support multiple formats)
+                                                    const remotePhone = (data.instance && data.instance.owner?.split('@')[0]) ||
+                                                        (data.owner?.split('@')[0]) ||
+                                                        instancePhone;
+
                                                     setInstancePhone(remotePhone);
                                                     onChange('instancePhone', remotePhone);
 
-                                                    // Save extracted data
-                                                    onChange('serverUrl', extractedServerUrl);
-                                                    onChange('instanceToken', extractedToken);
-                                                    onChange('instanceStatus', 'connected');
+                                                    // Extract Token if returned
+                                                    const remoteToken = (data.instance && data.instance.token) ||
+                                                        (data.token) ||
+                                                        formData.instanceToken;
+                                                    onChange('instanceToken', remoteToken);
 
+                                                    // Save Globally
+                                                    onChange('instanceStatus', 'connected');
                                                     await handleSaveSettings({
                                                         instancePhone: remotePhone,
                                                         instanceStatus: 'connected',
-                                                        serverUrl: extractedServerUrl,
-                                                        instanceToken: extractedToken,
-                                                        qrWebhookUrl: formData.connectionLink // Optional: save source
+                                                        serverUrl: formData.serverUrl,
+                                                        instanceToken: remoteToken
                                                     });
                                                 } else {
-                                                    alert('⚠️ A API respondeu, mas a instância não está conectada.\nStatus: ' + (data?.instance?.status || 'desconhecido'));
+                                                    alert('⚠️ O Webhook respondeu, mas não indicou conexão ativa.\nResposta: ' + JSON.stringify(data).slice(0, 100));
                                                 }
 
                                             } catch (error) {
@@ -306,13 +339,13 @@ const SettingsPage = ({ formData, onChange, user }) => {
                                             }
                                         }}
                                         className="px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-all shadow-md shadow-blue-200"
-                                        title="Verificar e Conectar"
+                                        title="Verificar"
                                     >
                                         VERIFICAR
                                     </button>
                                 </div>
                                 <p className="text-xs text-blue-600/70">
-                                    Cole o link completo (ex: https://api.site.com/instance/status?token=123) e clique em verificar.
+                                    Cole o Webhook que retorna o status da conexão (formato JSON).
                                 </p>
                             </div>
 
