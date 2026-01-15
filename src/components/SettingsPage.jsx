@@ -363,6 +363,62 @@ const SettingsPage = ({ formData, onChange, user }) => {
                                     <p className="text-xs text-gray-500">
                                         Informe o número conectado para gerar o QR Code de sessão.
                                     </p>
+                                    <div className="flex items-end">
+                                        <button
+                                            onClick={async () => {
+                                                if (!formData.serverUrl || !formData.instanceToken) {
+                                                    alert('Preencha Server URL e Token para verificar.');
+                                                    return;
+                                                }
+
+                                                setIsLoadingQr(true); // Reuse loader
+                                                try {
+                                                    // Direct Frontend Fetch
+                                                    const response = await fetch(`${formData.serverUrl}/instance/status`, {
+                                                        method: 'GET',
+                                                        headers: {
+                                                            'token': formData.instanceToken,
+                                                            'Content-Type': 'application/json'
+                                                        }
+                                                    });
+
+                                                    if (!response.ok) throw new Error(`Erro API: ${response.status}`);
+
+                                                    const data = await response.json();
+                                                    console.log('Verification data:', data);
+
+                                                    if (data && data.instance && (data.instance.status === 'open' || data.instance.status === 'connected')) {
+                                                        alert('Conexão Verificada com Sucesso! Salvando...');
+
+                                                        // Auto-fill phone if found
+                                                        const remotePhone = data.instance.owner?.split('@')[0] || instancePhone;
+                                                        setInstancePhone(remotePhone);
+                                                        onChange('instancePhone', remotePhone);
+
+                                                        // Save Globally
+                                                        onChange('instanceStatus', 'connected');
+                                                        await handleSaveSettings({
+                                                            instancePhone: remotePhone,
+                                                            instanceStatus: 'connected',
+                                                            serverUrl: formData.serverUrl,
+                                                            instanceToken: formData.instanceToken
+                                                        });
+                                                    } else {
+                                                        alert('A API respondeu, mas o status não é "connected". Status: ' + (data?.instance?.status || 'desconhecido'));
+                                                    }
+                                                } catch (error) {
+                                                    console.error(error);
+                                                    alert('Falha ao verificar conexão: ' + error.message);
+                                                } finally {
+                                                    setIsLoadingQr(false);
+                                                }
+                                            }}
+                                            className="w-full px-4 py-2 bg-sky-600 text-white font-medium rounded-lg hover:bg-sky-700 transition-all flex items-center justify-center gap-2"
+                                        >
+                                            <div className="w-2 h-2 rounded-full bg-white animate-pulse"></div>
+                                            Testar e Salvar Conexão
+                                        </button>
+                                    </div>
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2 duration-500">
