@@ -107,19 +107,34 @@ app.get('/api/whatsapp/status', async (req, res) => {
 
         const { serverUrl, instanceToken } = settings;
 
-        if (!serverUrl || !instanceToken) {
+        if (!serverUrl) {
             return res.json({ status: 'disconnected', reason: 'no_credentials' });
         }
 
-        const response = await fetch(`${serverUrl}/instance/status`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'token': instanceToken
-            }
-        });
+        const headers = {
+            'Content-Type': 'application/json'
+        };
+        if (instanceToken) headers['token'] = instanceToken;
 
-        if (!response.ok) {
+        // Smart Proxy Logic: Try Direct URL first, then Append Endpoint
+        // This mirrors the frontend logic to support both Webhooks and Base URLs
+        let response;
+        try {
+            // 1. Try Direct
+            response = await fetch(serverUrl, { method: 'GET', headers });
+
+            // 2. If Direct fails (404/MethodNotAllowed) and URL doesn't look like a webhook, try appending endpoint
+            if (!response.ok && !serverUrl.includes('webhook')) {
+                const appendUrl = `${serverUrl.replace(/\/$/, '')}/instance/status`;
+                const responseAppend = await fetch(appendUrl, { method: 'GET', headers });
+                if (responseAppend.ok) response = responseAppend;
+            }
+        } catch (e) {
+            console.error('Proxy fetch validation error:', e);
+            // If direct fetch errors, proceed to try fallback if we haven't already
+        }
+
+        if (!response || !response.ok) {
             return res.json({ status: 'disconnected', reason: 'api_error' });
         }
 
