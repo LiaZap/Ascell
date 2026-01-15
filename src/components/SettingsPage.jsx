@@ -63,14 +63,13 @@ const SettingsPage = ({ formData, onChange, user }) => {
         // Try to extract from qrWebhookUrl or webhookUrl if explicitly saving those or if they changed
         const sourceUrl = updates.qrWebhookUrl || formData.qrWebhookUrl;
 
-        if (sourceUrl) {
+        if (sourceUrl && !formData.serverUrl) {
             try {
                 const urlObj = new URL(sourceUrl);
-                // Extract Base URL (e.g. https://api.uazapi.com)
+                // Only extract if we don't have a value yet
                 derivedServerUrl = urlObj.origin;
 
                 // Extract Token (from ?token=, ?key=, or standard header logic if implied)
-                // Common pattern: ?token=XYZ or ?apikey=XYZ
                 const params = new URLSearchParams(urlObj.search);
                 derivedToken = params.get('token') || params.get('apikey') || params.get('key') || derivedToken;
             } catch (e) {
