@@ -211,12 +211,24 @@ const SettingsPage = ({ formData, onChange, user }) => {
         let interval;
         if (formData.instanceStatus === 'connected') {
             const check = async () => {
-                const data = await api.getConnectionStatus();
-                // Check format: { instance: { status: 'open' | 'connected' } }
-                if (data && data.instance && (data.instance.status === 'open' || data.instance.status === 'connected')) {
-                    setRealStatus('open');
-                } else {
-                    setRealStatus('disconnected');
+                try {
+                    const data = await api.getConnectionStatus();
+
+                    // Robust check (Matches performConnectionCheck logic)
+                    const isConnected = data && (
+                        (data.instance && (data.instance.status === 'open' || data.instance.status === 'connected')) ||
+                        (data.status === 'connected') ||
+                        (data.connected === true)
+                    );
+
+                    if (isConnected) {
+                        setRealStatus('open');
+                    } else {
+                        // Only flip to disconnected if we actually got a response that wasn't success
+                        if (data) setRealStatus('disconnected');
+                    }
+                } catch (e) {
+                    console.warn('Status poll failed', e);
                 }
             };
             check();
