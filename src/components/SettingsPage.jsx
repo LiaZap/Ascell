@@ -12,11 +12,24 @@ const SettingsPage = ({ formData, onChange, user }) => {
     // Auto-check connection on mount
     useEffect(() => {
         const autoCheck = async () => {
-            const data = await api.getConnectionStatus();
-            if (data && data.instance && data.instance.status === 'open') {
-                onChange('instanceStatus', 'connected');
-                // Optional: If API returns phone, we could update it too
-                // onChange('instancePhone', data.instance.phone); 
+            try {
+                const data = await api.getConnectionStatus();
+                console.log('Auto-check response:', data); // Debug for user
+
+                if (data && data.instance && (data.instance.status === 'open' || data.instance.status === 'connected')) {
+
+                    // Connected! Update status
+                    onChange('instanceStatus', 'connected');
+
+                    // Auto-fill phone if available in response
+                    const remotePhone = data.instance.owner?.split('@')[0];
+                    if (remotePhone) {
+                        setInstancePhone(remotePhone); // Update local state
+                        onChange('instancePhone', remotePhone); // Update global/form state
+                    }
+                }
+            } catch (err) {
+                console.warn('Auto-check failed', err);
             }
         };
         autoCheck();
@@ -123,8 +136,8 @@ const SettingsPage = ({ formData, onChange, user }) => {
         if (formData.instanceStatus === 'connected') {
             const check = async () => {
                 const data = await api.getConnectionStatus();
-                // API returns { instance: { status: 'open' } } usually
-                if (data && data.instance && data.instance.status === 'open') {
+                // Check format: { instance: { status: 'open' | 'connected' } }
+                if (data && data.instance && (data.instance.status === 'open' || data.instance.status === 'connected')) {
                     setRealStatus('open');
                 } else {
                     setRealStatus('disconnected');
