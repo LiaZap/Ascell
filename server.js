@@ -93,6 +93,47 @@ initDb();
 app.use(cors());
 app.use(express.json());
 
+// 4. Proxy for WhatsApp Status
+app.get('/api/whatsapp/status', async (req, res) => {
+    try {
+        const client = await pool.connect();
+        const settingsResult = await client.query('SELECT key, value FROM settings WHERE key IN ($1, $2)', ['serverUrl', 'instanceToken']);
+        client.release();
+
+        const settings = settingsResult.rows.reduce((acc, row) => {
+            acc[row.key] = row.value;
+            return acc;
+        }, {});
+
+        const { serverUrl, instanceToken } = settings;
+
+        if (!serverUrl || !instanceToken) {
+            return res.json({ status: 'disconnected', reason: 'no_credentials' });
+        }
+
+        const response = await fetch(`${serverUrl}/instance/status`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'token': instanceToken
+            }
+        });
+
+        if (!response.ok) {
+            // If the external API errors (e.g. 401 Unauthorized), we treat as disconnected
+            return res.json({ status: 'disconnected', reason: 'api_error' });
+        }
+
+        const data = await response.json();
+        // Forward the data from the API (usually { instance: { status: 'open' } } or similar)
+        res.json(data);
+
+    } catch (err) {
+        console.error('Error proxying status check:', err);
+        res.status(500).json({ error: 'Failed to check status' });
+    }
+});
+
 // Serve Static Files (Vite Build)
 app.use(express.static(path.join(__dirname, 'dist')));
 

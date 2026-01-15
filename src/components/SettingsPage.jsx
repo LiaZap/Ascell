@@ -103,6 +103,53 @@ const SettingsPage = ({ formData, onChange, user }) => {
         }
     };
 
+    // Check Real Status
+    useEffect(() => {
+        let interval;
+        if (formData.instanceStatus === 'connected') {
+            const check = async () => {
+                const data = await api.getConnectionStatus();
+                // API returns { instance: { status: 'open' } } usually
+                if (data && data.instance && data.instance.status === 'open') {
+                    setRealStatus('open');
+                } else {
+                    setRealStatus('disconnected');
+                }
+            };
+            check();
+            // Poll every 10 seconds to keep it fresh
+            interval = setInterval(check, 10000);
+        } else {
+            setRealStatus('disconnected');
+        }
+        return () => clearInterval(interval);
+    }, [formData.instanceStatus]);
+
+    const StatusDisplay = () => {
+        if (realStatus === 'checking') {
+            return (
+                <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-yellow-500 animate-ping"></span>
+                    <span className="font-bold text-yellow-400 text-xs">Verificando...</span>
+                </div>
+            );
+        }
+        if (realStatus === 'open') {
+            return (
+                <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]"></span>
+                    <span className="font-bold text-white lowercase">connected</span>
+                </div>
+            );
+        }
+        return (
+            <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-red-500"></span>
+                <span className="font-bold text-red-400 lowercase">disconnected (falha)</span>
+            </div>
+        );
+    };
+
     return (
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
             {/* Header */}
@@ -221,10 +268,7 @@ const SettingsPage = ({ formData, onChange, user }) => {
 
                                                 <div>
                                                     <p className="text-slate-400 text-xs font-semibold mb-1">Status:</p>
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]"></span>
-                                                        <span className="font-bold text-white lowercase">connected</span>
-                                                    </div>
+                                                    <StatusDisplay />
                                                 </div>
                                             </div>
                                         </div>
