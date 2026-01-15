@@ -271,7 +271,7 @@ const SettingsPage = ({ formData, onChange, user }) => {
 
                                             setIsLoadingQr(true);
                                             try {
-                                                // Verification Logic: Try Full URL first (Webhook mode), then Base URL mode
+                                                // Verification Logic: Try Full URL first, then Fallback
                                                 let targetUrl = formData.serverUrl;
                                                 let headers = { 'Content-Type': 'application/json' };
 
@@ -284,16 +284,29 @@ const SettingsPage = ({ formData, onChange, user }) => {
                                                 let response;
                                                 let data;
 
-                                                try {
-                                                    // 1. Try Direct Method (Fastest)
-                                                    response = await fetch(targetUrl, { method: 'GET', headers });
+                                                // Helper to try fetch strategies
+                                                const tryStrategies = async (baseFetchFn) => {
+                                                    // Strategy 1: GET Raw URL
+                                                    let res = await baseFetchFn(targetUrl, 'GET');
+                                                    if (res.ok) return res;
 
-                                                    // If direct fetch fails (e.g. 404) and it doesn't look like a webhook (no 'webhook' in url), try appending endpoint
-                                                    if (!response.ok && !targetUrl.includes('webhook')) {
-                                                        console.log('Direct fetch 404/Error, trying /instance/status endpoint...');
-                                                        targetUrl = `${formData.serverUrl.replace(/\/$/, '')}/instance/status`;
-                                                        response = await fetch(targetUrl, { method: 'GET', headers });
-                                                    }
+                                                    // Strategy 2: POST Raw URL (Some webhooks are POST-only)
+                                                    console.log('GET failed, trying POST...');
+                                                    res = await baseFetchFn(targetUrl, 'POST');
+                                                    if (res.ok) return res;
+
+                                                    // Strategy 3: GET Base + /instance/status (Append endpoint)
+                                                    // We try this regardless of whether it looks like a webhook or not
+                                                    const appendUrl = `${targetUrl.replace(/\/$/, '')}/instance/status`;
+                                                    console.log('Raw failed, trying appended endpoint:', appendUrl);
+                                                    res = await baseFetchFn(appendUrl, 'GET');
+
+                                                    return res; // Return last attempt result
+                                                };
+
+                                                try {
+                                                    // 1. Try Direct Method (Browser)
+                                                    response = await tryStrategies((url, method) => fetch(url, { method, headers }));
 
                                                     if (!response.ok) throw new Error(`Direct Error: ${response.status}`);
                                                     data = await response.json();
@@ -301,19 +314,30 @@ const SettingsPage = ({ formData, onChange, user }) => {
                                                 } catch (directError) {
                                                     console.warn('Direct fetch failed (likely CORS), trying Backend Proxy...', directError);
 
-                                                    // 2. Fallback to Backend Proxy (Bypasses CORS)
-                                                    const proxyResponse = await fetch('/api/proxy-check', {
-                                                        method: 'POST',
-                                                        headers: { 'Content-Type': 'application/json' },
-                                                        body: JSON.stringify({ url: targetUrl, token: formData.instanceToken })
-                                                    });
+                                                    // 2. Fallback to Backend Proxy (Server)
+                                                    // We reimplement the strategy logic but via the proxy endpoint
+                                                    // NOTE: The proxy checks a single URL/Method per request, so we need to port the retry logic or make multiple proxy calls.
+                                                    // For simplicity/speed, we'll try the same strategies by calling the proxy multiple times.
 
-                                                    if (!proxyResponse.ok) throw new Error('Proxy unreachable');
+                                                    const proxyFetch = async (url, method) => {
+                                                        const pRes = await fetch('/api/proxy-check', {
+                                                            method: 'POST',
+                                                            headers: { 'Content-Type': 'application/json' },
+                                                            body: JSON.stringify({ url, method, token: formData.instanceToken })
+                                                        });
+                                                        const pJson = await pRes.json();
+                                                        // Mimic a "fetch response" object for the strategy helper
+                                                        return {
+                                                            ok: pJson.ok,
+                                                            status: pJson.status,
+                                                            json: async () => pJson.data
+                                                        };
+                                                    };
 
-                                                    const proxyResult = await proxyResponse.json();
-                                                    if (!proxyResult.ok) throw new Error(`Proxy Error: ${proxyResult.status}`);
+                                                    response = await tryStrategies(proxyFetch);
 
-                                                    data = proxyResult.data;
+                                                    if (!response.ok) throw new Error(`Proxy Error: ${response.status} (Verifique a URL ou se o Webhook aceita GET/POST)`);
+                                                    data = await response.json();
                                                 }
 
                                                 console.log('Final Response Data:', data);

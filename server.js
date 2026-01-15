@@ -134,7 +134,7 @@ app.get('/api/whatsapp/status', async (req, res) => {
 
 // 4.1 Generic Proxy Check (For testing connections without CORS from frontend)
 app.post('/api/proxy-check', async (req, res) => {
-    const { url, token } = req.body;
+    const { url, token, method } = req.body; // Accept method param
 
     if (!url) {
         return res.status(400).json({ error: 'URL is required' });
@@ -144,8 +144,10 @@ app.post('/api/proxy-check', async (req, res) => {
         const headers = { 'Content-Type': 'application/json' };
         if (token) headers['token'] = token;
 
-        console.log('Proxying request to:', url);
-        const response = await fetch(url, { method: 'GET', headers });
+        const fetchMethod = method || 'GET'; // Default to GET
+        console.log(`Proxying ${fetchMethod} request to:`, url);
+
+        const response = await fetch(url, { method: fetchMethod, headers });
 
         // We return the status and data regardless of 200 OK, so frontend can handle it
         const data = await response.json().catch(() => ({})); // Handle non-json responses elegantly
