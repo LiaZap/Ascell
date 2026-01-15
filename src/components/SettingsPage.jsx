@@ -9,31 +9,80 @@ const SettingsPage = ({ formData, onChange, user }) => {
     const [isLoadingQr, setIsLoadingQr] = useState(false);
     const [realStatus, setRealStatus] = useState('checking');
 
+    // Unified Verification Logic
+    const performConnectionCheck = async (urlToTest, token) => {
+        let headers = { 'Content-Type': 'application/json' };
+        if (token) headers['token'] = token;
+
+        console.log('Testing connection to:', urlToTest);
+
+        // Helper to try fetch strategies
+        const tryStrategies = async (baseFetchFn) => {
+            // Strategy 1: GET Raw URL
+            let res = await baseFetchFn(urlToTest, 'GET');
+            if (res.ok) return res;
+
+            // Strategy 2: POST Raw URL (Some webhooks are POST-only)
+            let resPost = await baseFetchFn(urlToTest, 'POST');
+            if (resPost.ok) return resPost;
+
+            // Strategy 3: GET Base + /instance/status (Append endpoint)
+            const appendUrl = `${urlToTest.replace(/\/$/, '')}/instance/status`;
+            console.log('Raw failed, trying appended endpoint:', appendUrl);
+            let resAppend = await baseFetchFn(appendUrl, 'GET');
+
+            return resAppend; // Return last attempt result
+        };
+
+        try {
+            // 1. Try Direct Method (Browser)
+            let response = await tryStrategies((url, method) => fetch(url, { method, headers }));
+
+            if (response.ok) {
+                const data = await response.json();
+                return { success: true, data };
+            }
+
+            throw new Error(`Direct Error: ${response.status}`);
+
+        } catch (directError) {
+            console.warn('Direct fetch failed (likely CORS), trying Backend Proxy...', directError);
+
+            // 2. Fallback to Backend Proxy (Server)
+            const proxyFetch = async (url, method) => {
+                const pRes = await fetch('/api/proxy-check', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url, method, token })
+                });
+                const pJson = await pRes.json();
+                return {
+                    ok: pJson.ok,
+                    status: pJson.status,
+                    json: async () => pJson.data
+                };
+            };
+
+            const response = await tryStrategies(proxyFetch);
+            if (response.ok) {
+                const data = await response.json();
+                return { success: true, data };
+            }
+        }
+
+        return { success: false };
+    };
+
     // Auto-check connection on mount
     useEffect(() => {
         const autoCheck = async () => {
-            if (!formData.serverUrl) return; // Need a URL to check
+            if (!formData.serverUrl) return;
 
             try {
-                let targetUrl = formData.serverUrl;
-                let headers = { 'Content-Type': 'application/json' };
-                if (formData.instanceToken) headers['token'] = formData.instanceToken;
+                const result = await performConnectionCheck(formData.serverUrl, formData.instanceToken);
 
-                // Debug check type
-                console.log('Auto-check URL:', targetUrl);
-
-                let response = await fetch(targetUrl, { method: 'GET', headers });
-
-                // Fallback for legacy API URLs if direct failed
-                if (!response.ok && !targetUrl.includes('webhook')) {
-                    targetUrl = `${formData.serverUrl.replace(/\/$/, '')}/instance/status`;
-                    response = await fetch(targetUrl, { method: 'GET', headers });
-                }
-
-                if (response.ok) {
-                    const data = await response.json();
-
-                    // Robust check for various API formats
+                if (result.success) {
+                    const data = result.data;
                     const isConnected = data && (
                         (data.instance && (data.instance.status === 'open' || data.instance.status === 'connected')) ||
                         (data.status === 'connected') ||
@@ -42,18 +91,26 @@ const SettingsPage = ({ formData, onChange, user }) => {
 
                     if (isConnected) {
                         onChange('instanceStatus', 'connected');
-                        // Optional: update phone if it drifted
+                        // Update phone if found
                         const remotePhone = (data.instance && data.instance.owner?.split('@')[0]) ||
                             (data.owner?.split('@')[0]);
                         if (remotePhone) onChange('instancePhone', remotePhone);
+                    } else {
+                        // Only set disconnected if we are sure we got a valid response saying "not connected"
+                        // But if the check failed entirely (network), maybe keep 'checking'?
+                        // For now, if we got data but it's not connected, it's open/connecting/etc.
+                        if (data) onChange('instanceStatus', 'disconnected');
                     }
                 }
             } catch (err) {
-                console.warn('Auto-check failed', err);
+                console.warn('Auto-check critical fail', err);
             }
         };
-        autoCheck();
-    }, [formData.serverUrl]); // Re-run if serverUrl changes (e.g. valid load)
+
+        // Add a small delay/debounce to ensure form data is hydrated
+        const t = setTimeout(autoCheck, 1000);
+        return () => clearTimeout(t);
+    }, [formData.serverUrl]);
 
     const handleSaveSettings = async (updates = {}) => {
         // Automatic Extraction Logic
@@ -262,6 +319,7 @@ const SettingsPage = ({ formData, onChange, user }) => {
                                         onChange={(e) => onChange('serverUrl', e.target.value)}
                                     />
                                     <button
+                                        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors text-xs uppercase"
                                         onClick={async () => {
                                             if (!formData.serverUrl) {
                                                 alert('Cole o Webhook ou URL da API para verificar.');
@@ -270,122 +328,58 @@ const SettingsPage = ({ formData, onChange, user }) => {
 
                                             setIsLoadingQr(true);
                                             try {
-                                                // Verification Logic: Try Full URL first, then Fallback
-                                                let targetUrl = formData.serverUrl;
-                                                let headers = { 'Content-Type': 'application/json' };
+                                                const result = await performConnectionCheck(formData.serverUrl, formData.instanceToken);
 
-                                                if (formData.instanceToken) {
-                                                    headers['token'] = formData.instanceToken;
-                                                }
+                                                if (result.success) {
+                                                    const data = result.data;
+                                                    console.log('Manual Verify Response:', data);
 
-                                                console.log('Testing connection to:', targetUrl);
+                                                    const isConnected = data && (
+                                                        (data.instance && (data.instance.status === 'open' || data.instance.status === 'connected')) ||
+                                                        (data.status === 'connected') ||
+                                                        (data.connected === true)
+                                                    );
 
-                                                let response;
-                                                let data;
+                                                    if (isConnected) {
+                                                        alert('✅ Conexão Confirmada! Configurando sistema...');
 
-                                                // Helper to try fetch strategies
-                                                const tryStrategies = async (baseFetchFn) => {
-                                                    // Strategy 1: GET Raw URL
-                                                    let res = await baseFetchFn(targetUrl, 'GET');
-                                                    if (res.ok) return res;
+                                                        // Extract phone
+                                                        const remotePhone = (data.instance && data.instance.owner?.split('@')[0]) ||
+                                                            (data.owner?.split('@')[0]) ||
+                                                            instancePhone;
 
-                                                    // Strategy 2: POST Raw URL (Some webhooks are POST-only)
-                                                    console.log('GET failed, trying POST...');
-                                                    res = await baseFetchFn(targetUrl, 'POST');
-                                                    if (res.ok) return res;
+                                                        setInstancePhone(remotePhone);
+                                                        onChange('instancePhone', remotePhone);
 
-                                                    // Strategy 3: GET Base + /instance/status (Append endpoint)
-                                                    // We try this regardless of whether it looks like a webhook or not
-                                                    const appendUrl = `${targetUrl.replace(/\/$/, '')}/instance/status`;
-                                                    console.log('Raw failed, trying appended endpoint:', appendUrl);
-                                                    res = await baseFetchFn(appendUrl, 'GET');
+                                                        // Extract Token
+                                                        const remoteToken = (data.instance && data.instance.token) ||
+                                                            (data.token) ||
+                                                            formData.instanceToken;
+                                                        onChange('instanceToken', remoteToken);
 
-                                                    return res; // Return last attempt result
-                                                };
-
-                                                try {
-                                                    // 1. Try Direct Method (Browser)
-                                                    response = await tryStrategies((url, method) => fetch(url, { method, headers }));
-
-                                                    if (!response.ok) throw new Error(`Direct Error: ${response.status}`);
-                                                    data = await response.json();
-
-                                                } catch (directError) {
-                                                    console.warn('Direct fetch failed (likely CORS), trying Backend Proxy...', directError);
-
-                                                    // 2. Fallback to Backend Proxy (Server)
-                                                    // We reimplement the strategy logic but via the proxy endpoint
-                                                    // NOTE: The proxy checks a single URL/Method per request, so we need to port the retry logic or make multiple proxy calls.
-                                                    // For simplicity/speed, we'll try the same strategies by calling the proxy multiple times.
-
-                                                    const proxyFetch = async (url, method) => {
-                                                        const pRes = await fetch('/api/proxy-check', {
-                                                            method: 'POST',
-                                                            headers: { 'Content-Type': 'application/json' },
-                                                            body: JSON.stringify({ url, method, token: formData.instanceToken })
+                                                        // Save Globally
+                                                        onChange('instanceStatus', 'connected');
+                                                        await handleSaveSettings({
+                                                            instancePhone: remotePhone,
+                                                            instanceStatus: 'connected',
+                                                            serverUrl: formData.serverUrl,
+                                                            instanceToken: remoteToken
                                                         });
-                                                        const pJson = await pRes.json();
-                                                        // Mimic a "fetch response" object for the strategy helper
-                                                        return {
-                                                            ok: pJson.ok,
-                                                            status: pJson.status,
-                                                            json: async () => pJson.data
-                                                        };
-                                                    };
 
-                                                    response = await tryStrategies(proxyFetch);
-
-                                                    if (!response.ok) throw new Error(`Proxy Error: ${response.status} (Verifique a URL ou se o Webhook aceita GET/POST)`);
-                                                    data = await response.json();
-                                                }
-
-                                                console.log('Final Response Data:', data);
-
-                                                // Accept different "connected" states
-                                                const isConnected = data && (
-                                                    (data.instance && (data.instance.status === 'open' || data.instance.status === 'connected')) ||
-                                                    (data.status === 'connected') ||
-                                                    (data.connected === true)
-                                                );
-
-                                                if (isConnected) {
-                                                    alert('✅ Conexão Confirmada! Configurando sistema...');
-
-                                                    // Extract phone if available (support multiple formats)
-                                                    const remotePhone = (data.instance && data.instance.owner?.split('@')[0]) ||
-                                                        (data.owner?.split('@')[0]) ||
-                                                        instancePhone;
-
-                                                    setInstancePhone(remotePhone);
-                                                    onChange('instancePhone', remotePhone);
-
-                                                    // Extract Token if returned
-                                                    const remoteToken = (data.instance && data.instance.token) ||
-                                                        (data.token) ||
-                                                        formData.instanceToken;
-                                                    onChange('instanceToken', remoteToken);
-
-                                                    // Save Globally
-                                                    onChange('instanceStatus', 'connected');
-                                                    await handleSaveSettings({
-                                                        instancePhone: remotePhone,
-                                                        instanceStatus: 'connected',
-                                                        serverUrl: formData.serverUrl,
-                                                        instanceToken: remoteToken
-                                                    });
+                                                    } else {
+                                                        alert(`⚠️ Conectado ao Webhook, mas instância parece desconectada. Status: ${JSON.stringify(data)}`);
+                                                    }
                                                 } else {
-                                                    alert('⚠️ O Webhook respondeu, mas não indicou conexão ativa.\nResposta: ' + JSON.stringify(data).slice(0, 100));
+                                                    throw new Error('Falha na verificação da conexão (todas as tentativas falharam).');
                                                 }
 
                                             } catch (error) {
                                                 console.error(error);
-                                                alert('❌ Falha na conexão: ' + error.message);
+                                                alert(`❌ Falha na conexão: ${error.message}`);
                                             } finally {
                                                 setIsLoadingQr(false);
                                             }
                                         }}
-                                        className="px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-all shadow-md shadow-blue-200"
-                                        title="Verificar"
                                     >
                                         VERIFICAR
                                     </button>
@@ -397,7 +391,7 @@ const SettingsPage = ({ formData, onChange, user }) => {
 
                             <div className="pt-4 flex justify-end">
                                 <button
-                                    className="flex items-center gap-2 px-6 py-2.5 bg-primary text-white font-medium rounded-lg shadow-lg shadow-primary/20 hover:bg-primary-dark transition-all active:translate-y-0.5 w-full justify-center"
+                                    className="w-full flex items-center justify-center gap-2 bg-blue-800 hover:bg-blue-900 text-white py-3 rounded-lg font-medium transition-colors shadow-sm mt-4"
                                     onClick={async () => {
                                         const success = await handleSaveSettings();
                                         if (success) alert('Configurações salvas com sucesso!');
