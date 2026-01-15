@@ -9,6 +9,19 @@ const SettingsPage = ({ formData, onChange, user }) => {
     const [isLoadingQr, setIsLoadingQr] = useState(false);
     const [realStatus, setRealStatus] = useState('checking');
 
+    // Auto-check connection on mount
+    useEffect(() => {
+        const autoCheck = async () => {
+            const data = await api.getConnectionStatus();
+            if (data && data.instance && data.instance.status === 'open') {
+                onChange('instanceStatus', 'connected');
+                // Optional: If API returns phone, we could update it too
+                // onChange('instancePhone', data.instance.phone); 
+            }
+        };
+        autoCheck();
+    }, []);
+
     const handleSaveSettings = async (updates = {}) => {
         // Automatic Extraction Logic
         let derivedServerUrl = formData.serverUrl;
