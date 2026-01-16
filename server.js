@@ -120,10 +120,17 @@ app.get('/api/whatsapp/status', async (req, res) => {
         // This mirrors the frontend logic to support both Webhooks and Base URLs
         let response;
         try {
-            // 1. Try Direct
+            // 1. Try GET Direct
             response = await fetch(serverUrl, { method: 'GET', headers });
 
-            // 2. If Direct fails (404/MethodNotAllowed) and URL doesn't look like a webhook, try appending endpoint
+            // 2. If GET fails, try POST (n8n webhooks are often POST-only)
+            if (!response.ok) {
+                console.log('GET failed, trying POST for:', serverUrl);
+                const postResponse = await fetch(serverUrl, { method: 'POST', headers, body: JSON.stringify({}) });
+                if (postResponse.ok) response = postResponse;
+            }
+
+            // 3. If still fails and URL doesn't look like a webhook, try appending endpoint
             if (!response.ok && !serverUrl.includes('webhook')) {
                 const appendUrl = `${serverUrl.replace(/\/$/, '')}/instance/status`;
                 const responseAppend = await fetch(appendUrl, { method: 'GET', headers });
