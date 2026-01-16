@@ -231,22 +231,22 @@ function App() {
         {/* Dynamic Content Area */}
         {activeView === 'dashboard' && (
           <>
-            <header className="sticky top-0 z-40 w-full bg-gradient-to-r from-white via-white to-blue-50/50 border-b border-gray-100/50 backdrop-blur-xl shadow-sm">
+            <header className="sticky top-0 z-40 w-full bg-gradient-to-r from-white via-white to-red-50/30 border-b border-gray-100/50 backdrop-blur-xl shadow-sm">
               <div className="container mx-auto max-w-7xl h-20 flex items-center justify-between px-6 lg:px-8">
                 {/* Left: Brand */}
                 <div className="flex items-center gap-4">
                   <div className="relative group">
-                    <div className="absolute inset-0 bg-gradient-to-br from-blue-600 to-cyan-500 rounded-2xl blur-lg opacity-40 group-hover:opacity-60 transition-opacity"></div>
-                    <div className="relative w-12 h-12 bg-gradient-to-br from-blue-600 to-cyan-500 rounded-2xl shadow-lg flex items-center justify-center text-white transform group-hover:scale-105 transition-transform duration-300">
+                    <div className="absolute inset-0 bg-gradient-to-br from-red-600 to-red-500 rounded-2xl blur-lg opacity-40 group-hover:opacity-60 transition-opacity"></div>
+                    <div className="relative w-12 h-12 bg-gradient-to-br from-red-600 to-red-500 rounded-2xl shadow-lg flex items-center justify-center text-white transform group-hover:scale-105 transition-transform duration-300">
                       <Shield size={26} />
                     </div>
                   </div>
                   <div>
-                    <h1 className="text-xl font-bold tracking-tight bg-gradient-to-r from-gray-900 via-blue-900 to-gray-900 bg-clip-text text-transparent">
+                    <h1 className="text-xl font-bold tracking-tight bg-gradient-to-r from-gray-900 via-red-900 to-gray-900 bg-clip-text text-transparent">
                       ASCEL Supervisor
                     </h1>
                     <div className="flex items-center gap-2 mt-0.5">
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-sm">
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-gradient-to-r from-red-500 to-red-600 text-white shadow-sm">
                         v2.1.0
                       </span>
                       <span className="text-xs text-gray-400 font-medium">
@@ -260,8 +260,8 @@ function App() {
                 <div className="flex items-center gap-4">
                   {/* Premium Status Badge */}
                   <div className={`flex items-center gap-2 px-4 py-2 rounded-xl border shadow-sm ${formData.instanceStatus === 'connected'
-                      ? 'bg-gradient-to-r from-emerald-50 to-green-50 border-emerald-200'
-                      : 'bg-gradient-to-r from-red-50 to-orange-50 border-red-200'
+                    ? 'bg-gradient-to-r from-emerald-50 to-green-50 border-emerald-200'
+                    : 'bg-gradient-to-r from-red-50 to-orange-50 border-red-200'
                     }`}>
                     <div className={`relative w-2.5 h-2.5 rounded-full ${formData.instanceStatus === 'connected' ? 'bg-emerald-500' : 'bg-red-500'
                       }`}>

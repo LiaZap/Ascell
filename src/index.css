@@ -17,30 +17,30 @@
 }
 
 :root {
-  /* Modern SaaS Palette (Slate based) */
-  --color-primary: #2563eb;
-  /* Royal Blue */
-  --color-primary-light: #3b82f6;
-  /* Lighter Blue */
-  --color-primary-dark: #1d4ed8;
-  /* Deep Blue */
+  /* ASCEL Brand Colors - Red & Dark */
+  --color-primary: #C41E3A;
+  /* ASCEL Red */
+  --color-primary-light: #DC143C;
+  /* Crimson */
+  --color-primary-dark: #9B1B30;
+  /* Dark Red */
 
   --color-bg-page: #f8fafc;
   /* Slate 50 - Light clean background */
   --color-bg-card: #ffffff;
   /* White */
 
-  --color-text-main: #0f172a;
-  /* Slate 900 - Sharp text */
-  --color-text-secondary: #475569;
-  /* Slate 600 - Muted text */
-  --color-text-light: #94a3b8;
-  /* Slate 400 - Light text */
+  --color-text-main: #1a1a1a;
+  /* Near Black */
+  --color-text-secondary: #4a4a4a;
+  /* Dark Gray */
+  --color-text-light: #7a7a7a;
+  /* Medium Gray */
 
-  --color-border: #e2e8f0;
-  /* Slate 200 */
-  --color-border-hover: #cbd5e1;
-  /* Slate 300 */
+  --color-border: #e5e5e5;
+  /* Light Gray */
+  --color-border-hover: #d4d4d4;
+  /* Gray */
 
   --color-success: #10b981;
   /* Emerald */

@@ -147,14 +147,14 @@ const DashboardForm = ({ formData, onChange, onGenerateProtocol }) => {
     return (
         <div className="bg-white rounded-2xl shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden text-gray-800">
             {/* Premium Header */}
-            <div className="relative px-8 py-6 border-b border-gray-100 bg-gradient-to-r from-white via-blue-50/30 to-white overflow-hidden">
+            <div className="relative px-8 py-6 border-b border-gray-100 bg-gradient-to-r from-white via-red-50/20 to-white overflow-hidden">
                 {/* Decorative Elements */}
-                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-500/5 to-cyan-500/5 rounded-full blur-2xl"></div>
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-red-500/5 to-red-600/5 rounded-full blur-2xl"></div>
 
                 <div className="relative flex items-center justify-between">
                     <div>
                         <h2 className="text-lg font-bold flex items-center gap-3 text-gray-900">
-                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
+                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center shadow-lg shadow-red-500/20">
                                 <Settings size={20} className="text-white" />
                             </div>
                             Configuração do Agente
@@ -416,7 +416,7 @@ const DashboardForm = ({ formData, onChange, onGenerateProtocol }) => {
                 <button
                     type="submit"
                     disabled={isSending}
-                    className="relative w-full py-4 bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-500 text-white font-bold rounded-xl shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 hover:-translate-y-0.5 transform transition-all flex items-center justify-center gap-3 group text-sm uppercase tracking-wide disabled:opacity-70 disabled:cursor-not-allowed overflow-hidden"
+                    className="relative w-full py-4 bg-gradient-to-r from-red-600 via-red-500 to-red-600 text-white font-bold rounded-xl shadow-lg shadow-red-500/30 hover:shadow-xl hover:shadow-red-500/40 hover:-translate-y-0.5 transform transition-all flex items-center justify-center gap-3 group text-sm uppercase tracking-wide disabled:opacity-70 disabled:cursor-not-allowed overflow-hidden"
                 >
                     {/* Shine Effect */}
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
