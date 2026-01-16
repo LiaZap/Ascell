@@ -168,8 +168,10 @@ const SettingsPage = ({ formData, onChange, user }) => {
             instanceStatus: formData.instanceStatus,
             serverUrl: derivedServerUrl,
             instanceToken: derivedToken,
-            ...updates
+            ...updates // This MUST override the values above
         };
+
+        console.log('💾 Saving settings to DB:', payload);
 
         try {
             await api.updateSettings(payload);
@@ -278,26 +280,21 @@ const SettingsPage = ({ formData, onChange, user }) => {
     }, [formData.instanceStatus]);
 
     const StatusDisplay = () => {
-        if (realStatus === 'checking') {
-            return (
-                <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-yellow-500 animate-ping"></span>
-                    <span className="font-bold text-yellow-400 text-xs">Verificando...</span>
-                </div>
-            );
-        }
-        if (realStatus === 'open') {
+        // Simplified: Trust the database status directly
+        const status = formData.instanceStatus;
+
+        if (status === 'connected') {
             return (
                 <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]"></span>
-                    <span className="font-bold text-white lowercase">connected</span>
+                    <span className="font-bold text-emerald-400 lowercase">ativo</span>
                 </div>
             );
         }
         return (
             <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-red-500"></span>
-                <span className="font-bold text-red-400 lowercase">disconnected (falha)</span>
+                <span className="font-bold text-red-400 lowercase">desconectado</span>
             </div>
         );
     };
