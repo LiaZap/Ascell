@@ -138,7 +138,11 @@ app.get('/api/whatsapp/status', async (req, res) => {
             return res.json({ status: 'disconnected', reason: 'api_error' });
         }
 
-        const data = await response.json();
+        const rawData = await response.json();
+
+        // Normalize n8n Array response: [{ instance: ... }] -> { instance: ... }
+        const data = Array.isArray(rawData) ? rawData[0] : rawData;
+
         res.json(data);
 
     } catch (err) {
