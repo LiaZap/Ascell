@@ -1,4 +1,4 @@
-import { LayoutDashboard, FileText, Users, LogOut, Settings, BarChart3, ChevronRight, BookOpen } from 'lucide-react';
+import { LayoutDashboard, FileText, Users, LogOut, Settings, BarChart3, ChevronRight } from 'lucide-react';
 import logoAscel from '../assets/logo-ascel.jpg';
 
 const Sidebar = ({ activeView, onViewChange, onLogout, user }) => {
@@ -7,7 +7,6 @@ const Sidebar = ({ activeView, onViewChange, onLogout, user }) => {
         { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, roles: ['Operador', 'Administrador', 'Supervisor'] },
         { id: 'analytics', label: 'Análise de Disparos', icon: BarChart3, roles: ['Administrador', 'Supervisor'] },
         { id: 'logs', label: 'Logs de Disparo', icon: FileText, roles: ['Administrador', 'Supervisor'] },
-        { id: 'material', label: 'Material', icon: BookOpen, roles: ['Administrador', 'Supervisor', 'Operador'] },
         { id: 'users', label: 'Gestão de Usuários', icon: Users, roles: ['Administrador', 'Supervisor'] },
         { id: 'settings', label: 'Configurações', icon: Settings, roles: ['Administrador', 'Supervisor'] },
     ];
@@ -61,8 +60,8 @@ const Sidebar = ({ activeView, onViewChange, onLogout, user }) => {
 
                             {/* Icon Container */}
                             <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-300 ${activeView === item.id
-                                ? 'bg-gradient-to-br from-red-500 to-red-700 shadow-md shadow-red-500/30'
-                                : 'bg-white/5 group-hover:bg-white/10'
+                                    ? 'bg-gradient-to-br from-red-500 to-red-700 shadow-md shadow-red-500/30'
+                                    : 'bg-white/5 group-hover:bg-white/10'
                                 }`}>
                                 <item.icon size={16} className={activeView === item.id ? 'text-white' : 'text-gray-400 group-hover:text-white'} />
                             </div>
