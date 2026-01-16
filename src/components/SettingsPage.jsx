@@ -98,14 +98,18 @@ const SettingsPage = ({ formData, onChange, user }) => {
                             (data.owner?.split('@')[0]);
                         if (remotePhone) onChange('instancePhone', remotePhone);
 
-                        // CRITICAL: Persist to Backend to allow Global Status Sync
+                        // CRITICAL: Persist EVERYTHING to Backend to allow Global Status Sync
                         try {
-                            // Only save if status is different or we are ensuring consistency
-                            await api.updateSettings({
+                            // Save URL, Token, Phone and Status so OTHER users can access it
+                            const settingsPayload = {
                                 instanceStatus: 'connected',
+                                serverUrl: formData.serverUrl, // Ensure this propagates
+                                instanceToken: formData.instanceToken, // Ensure this propagates
                                 ...(remotePhone ? { instancePhone: remotePhone } : {})
-                            });
-                            console.log('🔗 Connection status synced to Global DB');
+                            };
+
+                            await api.updateSettings(settingsPayload);
+                            console.log('🔗 FULL Connection status synced to Global DB', settingsPayload);
                         } catch (err) {
                             console.error('Failed to sync status to DB', err);
                         }
