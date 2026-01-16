@@ -90,16 +90,35 @@ const SettingsPage = ({ formData, onChange, user }) => {
                     );
 
                     if (isConnected) {
+                        // Sync Local State
                         onChange('instanceStatus', 'connected');
+
                         // Update phone if found
                         const remotePhone = (data.instance && data.instance.owner?.split('@')[0]) ||
                             (data.owner?.split('@')[0]);
                         if (remotePhone) onChange('instancePhone', remotePhone);
+
+                        // CRITICAL: Persist to Backend to allow Global Status Sync
+                        try {
+                            // Only save if status is different or we are ensuring consistency
+                            await api.updateSettings({
+                                instanceStatus: 'connected',
+                                ...(remotePhone ? { instancePhone: remotePhone } : {})
+                            });
+                            console.log('🔗 Connection status synced to Global DB');
+                        } catch (err) {
+                            console.error('Failed to sync status to DB', err);
+                        }
+
                     } else {
                         // Only set disconnected if we are sure we got a valid response saying "not connected"
-                        // But if the check failed entirely (network), maybe keep 'checking'?
-                        // For now, if we got data but it's not connected, it's open/connecting/etc.
-                        if (data) onChange('instanceStatus', 'disconnected');
+                        if (data) {
+                            onChange('instanceStatus', 'disconnected');
+                            // Sync disconnected state too if it was previously connected
+                            if (formData.instanceStatus === 'connected') {
+                                api.updateSettings({ instanceStatus: 'disconnected' });
+                            }
+                        }
                     }
                 }
             } catch (err) {
