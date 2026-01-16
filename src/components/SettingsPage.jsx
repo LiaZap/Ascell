@@ -118,10 +118,14 @@ const SettingsPage = ({ formData, onChange, user }) => {
                         // Only set disconnected if we are sure we got a valid response saying "not connected"
                         if (data) {
                             onChange('instanceStatus', 'disconnected');
-                            // Sync disconnected state too if it was previously connected
+                            // SAFETY FIX: Do NOT update global DB to disconnected automatically on background check failure.
+                            // This prevents one user's network issue from disconnecting the entire company.
+                            // Only explicit user action should disconnect globally.
+                            /* 
                             if (formData.instanceStatus === 'connected') {
                                 api.updateSettings({ instanceStatus: 'disconnected' });
                             }
+                            */
                         }
                     }
                 }
