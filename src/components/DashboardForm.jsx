@@ -145,27 +145,36 @@ const DashboardForm = ({ formData, onChange, onGenerateProtocol }) => {
     };
 
     return (
-        <div className="bg-[var(--color-bg-card)] rounded-xl shadow-lg border border-gray-100/50 overflow-hidden text-gray-800">
-            {/* Header */}
-            <div className="px-8 py-6 border-b border-gray-100 flex items-center justify-between bg-white">
-                <div>
-                    <h2 className="text-lg font-bold flex items-center gap-2 text-gray-900">
-                        <Settings size={20} className="text-primary" />
-                        Configuração do Agente
-                    </h2>
-                    <p className="text-sm text-gray-500 mt-1">Personalize as mensagens e configurações de envio.</p>
-                </div>
-                <div className="flex items-center gap-2 text-xs font-mono text-gray-500 bg-gray-50 border border-gray-200 px-3 py-1.5 rounded-md hover:border-gray-300 transition-colors">
-                    <span>Protocolo:</span>
-                    <span className="font-bold text-gray-900">{formData.protocolCode}</span>
-                    <button
-                        onClick={onGenerateProtocol}
-                        className="ml-1 p-1 hover:bg-gray-200 rounded-full text-gray-400 hover:text-primary transition-colors"
-                        title="Gerar novo protocolo"
-                        type="button"
-                    >
-                        <RefreshCcw size={12} />
-                    </button>
+        <div className="bg-white rounded-2xl shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden text-gray-800">
+            {/* Premium Header */}
+            <div className="relative px-8 py-6 border-b border-gray-100 bg-gradient-to-r from-white via-blue-50/30 to-white overflow-hidden">
+                {/* Decorative Elements */}
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-500/5 to-cyan-500/5 rounded-full blur-2xl"></div>
+
+                <div className="relative flex items-center justify-between">
+                    <div>
+                        <h2 className="text-lg font-bold flex items-center gap-3 text-gray-900">
+                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
+                                <Settings size={20} className="text-white" />
+                            </div>
+                            Configuração do Agente
+                        </h2>
+                        <p className="text-sm text-gray-400 mt-1 ml-[52px]">Personalize as mensagens e configurações de envio.</p>
+                    </div>
+
+                    {/* Protocol Badge - Premium */}
+                    <div className="flex items-center gap-2 bg-gradient-to-r from-gray-900 to-gray-800 text-white px-4 py-2.5 rounded-xl shadow-lg">
+                        <span className="text-[10px] uppercase tracking-wider text-gray-400">Protocolo:</span>
+                        <span className="font-bold text-sm tracking-wide">{formData.protocolCode}</span>
+                        <button
+                            onClick={onGenerateProtocol}
+                            className="ml-1 p-1.5 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white transition-colors"
+                            title="Gerar novo protocolo"
+                            type="button"
+                        >
+                            <RefreshCcw size={14} />
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -407,8 +416,11 @@ const DashboardForm = ({ formData, onChange, onGenerateProtocol }) => {
                 <button
                     type="submit"
                     disabled={isSending}
-                    className="w-full py-4 bg-primary text-white font-bold rounded-lg shadow-lg hover:bg-primary-dark hover:shadow-xl hover:-translate-y-0.5 transform transition-all flex items-center justify-center gap-2 group text-sm uppercase tracking-wide disabled:opacity-70 disabled:cursor-not-allowed"
+                    className="relative w-full py-4 bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-500 text-white font-bold rounded-xl shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 hover:-translate-y-0.5 transform transition-all flex items-center justify-center gap-3 group text-sm uppercase tracking-wide disabled:opacity-70 disabled:cursor-not-allowed overflow-hidden"
                 >
+                    {/* Shine Effect */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+
                     {isSending ? (
                         <>
                             <Loader2 size={20} className="animate-spin" />
@@ -417,7 +429,7 @@ const DashboardForm = ({ formData, onChange, onGenerateProtocol }) => {
                     ) : (
                         <>
                             <span>{formData.messageType === 'meeting' ? 'Agendar Lembrete' : 'Agendar Envio de Certificado'}</span>
-                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" className="transform group-hover:translate-x-1 transition-transform"><path d="M3.33334 8H12.6667M12.6667 8L8.00001 3.33333M12.6667 8L8.00001 12.6667" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                            <svg width="18" height="18" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" className="transform group-hover:translate-x-1 transition-transform"><path d="M3.33334 8H12.6667M12.6667 8L8.00001 3.33333M12.6667 8L8.00001 12.6667" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
                         </>
                     )}
                 </button>
