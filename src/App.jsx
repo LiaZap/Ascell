@@ -7,6 +7,7 @@ import Sidebar from './components/Sidebar';
 import LogsPage from './components/LogsPage';
 import UsersPage from './components/UsersPage';
 import SettingsPage from './components/SettingsPage';
+import AnalyticsPage from './components/AnalyticsPage';
 import LoginPage from './components/LoginPage';
 import { Shield } from 'lucide-react';
 import { MEETING_TEMPLATES, CERTIFICATE_TEMPLATES } from './data/templates';
@@ -272,6 +273,7 @@ function App() {
 
         {/* Other Views */}
         <main className="p-8">
+          {activeView === 'analytics' && <AnalyticsPage />}
           {activeView === 'logs' && <LogsPage />}
           {activeView === 'users' && <UsersPage />}
           {activeView === 'settings' && <SettingsPage formData={formData} onChange={handleChange} user={currentUser} />}
