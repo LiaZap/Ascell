@@ -18,20 +18,24 @@ const SettingsPage = ({ formData, onChange, user }) => {
 
         // Helper to try fetch strategies
         const tryStrategies = async (baseFetchFn) => {
-            // Strategy 1: GET Raw URL
-            let res = await baseFetchFn(urlToTest, 'GET');
-            if (res.ok) return res;
+            // Strategy 1: GET Raw URL (Disabled as per user request)
+            // let res = await baseFetchFn(urlToTest, 'GET');
+            // if (res.ok) return res;
 
-            // Strategy 2: POST Raw URL (Some webhooks are POST-only)
+            // Strategy 2: POST Raw URL (Priority Method)
             let resPost = await baseFetchFn(urlToTest, 'POST');
             if (resPost.ok) return resPost;
 
             // Strategy 3: GET Base + /instance/status (Append endpoint)
+            // Also disabled to avoid GET spam if user strictly wants POST to the specific URL
+            /*
             const appendUrl = `${urlToTest.replace(/\/$/, '')}/instance/status`;
             console.log('Raw failed, trying appended endpoint:', appendUrl);
             let resAppend = await baseFetchFn(appendUrl, 'GET');
+            return resAppend; 
+            */
 
-            return resAppend; // Return last attempt result
+            return resPost; // Return result of POST
         };
 
         try {
