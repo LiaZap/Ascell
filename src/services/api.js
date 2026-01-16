@@ -96,8 +96,13 @@ export const api = {
     getSettings: async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`${API_URL}/settings`, {
-                headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+            // Prevent caching with timestamp and headers
+            const response = await fetch(`${API_URL}/settings?t=${Date.now()}`, {
+                headers: {
+                    ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+                    'Cache-Control': 'no-cache',
+                    'Pragma': 'no-cache'
+                }
             });
             if (!response.ok) throw new Error('Failed to fetch settings');
             return await response.json();

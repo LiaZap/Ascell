@@ -109,9 +109,14 @@ function App() {
       const loadSettings = async () => {
         try {
           const settings = await api.getSettings();
+          console.log('Global Settings Loaded:', settings);
+
           if (settings) {
             setFormData(prev => ({
               ...prev,
+              // Prioritize Global Settings, fallback to local only if global is missing/empty and local exists
+              // Actually, global should be the source of truth. If global is empty, we technically default to empty.
+              // But to be safe, we use logical OR.
               webhookUrl: settings.webhookUrl || prev.webhookUrl,
               qrWebhookUrl: settings.qrWebhookUrl || prev.qrWebhookUrl,
               instancePhone: settings.instancePhone || prev.instancePhone,
@@ -120,7 +125,7 @@ function App() {
               instanceToken: settings.instanceToken || prev.instanceToken
             }));
 
-            // Persist to local storage for persistence across reloads
+            // Persist to local storage immediately to sync state
             if (settings.webhookUrl) localStorage.setItem('webhookUrl', settings.webhookUrl);
             if (settings.qrWebhookUrl) localStorage.setItem('qrWebhookUrl', settings.qrWebhookUrl);
             if (settings.instancePhone) localStorage.setItem('instancePhone', settings.instancePhone);
