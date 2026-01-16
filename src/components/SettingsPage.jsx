@@ -579,8 +579,13 @@ const SettingsPage = ({ formData, onChange, user }) => {
 
                                 <button
                                     onClick={async () => {
-                                        // If user wants to manually save without generating QR (for testing or if already connected)
-                                        if (instancePhone) {
+                                        // FIX: Prioritize QR Code generation if Webhook URL is present
+                                        // Previous logic incorrectly forced a manual save if phone was present
+                                        if (formData.qrWebhookUrl) {
+                                            await handleGenerateQRCode();
+                                        }
+                                        // Fallback: Manual save only if NO QR Webhook is configured
+                                        else if (instancePhone) {
                                             onChange('instancePhone', instancePhone);
                                             onChange('instanceStatus', 'connected');
 
@@ -592,7 +597,7 @@ const SettingsPage = ({ formData, onChange, user }) => {
                                                 instanceToken: formData.instanceToken
                                             });
                                         } else {
-                                            handleGenerateQRCode();
+                                            handleGenerateQRCode(); // Will trigger validation alert
                                         }
                                     }}
                                     disabled={!instancePhone}
