@@ -10,6 +10,7 @@ import SettingsPage from './components/SettingsPage';
 import LoginPage from './components/LoginPage';
 import { Shield } from 'lucide-react';
 import { MEETING_TEMPLATES, CERTIFICATE_TEMPLATES } from './data/templates';
+import { api } from './services/api';
 
 const INITIAL_FORM_STATE = {
   // Client Data
