@@ -116,21 +116,13 @@ app.get('/api/whatsapp/status', async (req, res) => {
         };
         if (instanceToken) headers['token'] = instanceToken;
 
-        // Smart Proxy Logic: Try Direct URL first, then Append Endpoint
-        // This mirrors the frontend logic to support both Webhooks and Base URLs
+        // Smart Proxy Logic: Use POST for n8n webhooks
         let response;
         try {
-            // 1. Try GET Direct
-            response = await fetch(serverUrl, { method: 'GET', headers });
+            // Use POST directly (n8n webhooks require POST)
+            response = await fetch(serverUrl, { method: 'POST', headers, body: JSON.stringify({}) });
 
-            // 2. If GET fails, try POST (n8n webhooks are often POST-only)
-            if (!response.ok) {
-                console.log('GET failed, trying POST for:', serverUrl);
-                const postResponse = await fetch(serverUrl, { method: 'POST', headers, body: JSON.stringify({}) });
-                if (postResponse.ok) response = postResponse;
-            }
-
-            // 3. If still fails and URL doesn't look like a webhook, try appending endpoint
+            // Fallback: If URL doesn't look like a webhook, try appending endpoint with GET
             if (!response.ok && !serverUrl.includes('webhook')) {
                 const appendUrl = `${serverUrl.replace(/\/$/, '')}/instance/status`;
                 const responseAppend = await fetch(appendUrl, { method: 'GET', headers });
@@ -138,7 +130,6 @@ app.get('/api/whatsapp/status', async (req, res) => {
             }
         } catch (e) {
             console.error('Proxy fetch validation error:', e);
-            // If direct fetch errors, proceed to try fallback if we haven't already
         }
 
         if (!response || !response.ok) {
