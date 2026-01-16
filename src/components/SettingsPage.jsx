@@ -238,21 +238,30 @@ const SettingsPage = ({ formData, onChange, user }) => {
     // Check Real Status
     useEffect(() => {
         let interval;
-        if (formData.instanceStatus === 'connected') {
+        // Default Webhook URL Update if empty
+        if (!formData.serverUrl) {
+            onChange('serverUrl', 'https://workflows.liaautomacoes.site/webhook/e7d1e18b-523a-43b2-92c2-521306aa1117');
+        }
+
+        if (formData.instanceStatus === 'connected' || realStatus === 'checking') {
             const check = async () => {
                 try {
-                    const rawData = await api.getConnectionStatus();
+                    // FIX: Use internal check instead of missing api.getConnectionStatus
+                    // Use the hardcoded URL if for some reason formData is empty, but it should have been set above
+                    const urlToCheck = formData.serverUrl || 'https://workflows.liaautomacoes.site/webhook/e7d1e18b-523a-43b2-92c2-521306aa1117';
+                    const result = await performConnectionCheck(urlToCheck, formData.instanceToken);
 
-                    // Handle broken/empty response
-                    if (!rawData || (rawData.status === 'disconnected' && !rawData.instance)) {
+                    if (!result.success) {
                         setRealStatus('disconnected');
                         return;
                     }
 
+                    const rawData = result.data;
+
                     // Handle n8n Array Response
                     const data = Array.isArray(rawData) ? rawData[0] : rawData;
 
-                    // Robust check (Matches performConnectionCheck logic)
+                    // Robust check
                     const isConnected = data && (
                         (data.instance && (data.instance.status === 'open' || data.instance.status === 'connected')) ||
                         (data.status && (data.status === 'connected' || data.status.connected === true)) ||
@@ -260,9 +269,13 @@ const SettingsPage = ({ formData, onChange, user }) => {
                     );
 
                     if (isConnected) {
-                        setRealStatus('open');
+                        // Popup Logic: Only show if we weren't open before (transition)
+                        if (realStatus !== 'open') {
+                            setRealStatus('open');
+                            // Show Popup
+                            alert('✅ Conectado com Sucesso!'); // Simple popup as requested
+                        }
                     } else {
-                        // If we got data but it's not connected, it's definitively disconnected
                         setRealStatus('disconnected');
                     }
                 } catch (e) {
@@ -270,14 +283,15 @@ const SettingsPage = ({ formData, onChange, user }) => {
                     setRealStatus('disconnected');
                 }
             };
+
             check();
-            // Poll every 10 seconds to keep it fresh
-            interval = setInterval(check, 10000);
+            // Poll every 5 seconds to catch connection quickly
+            interval = setInterval(check, 5000);
         } else {
             setRealStatus('disconnected');
         }
         return () => clearInterval(interval);
-    }, [formData.instanceStatus]);
+    }, [formData.instanceStatus, formData.serverUrl, realStatus]);
 
     const StatusDisplay = () => {
         // Simplified: Trust the database status directly
@@ -477,22 +491,7 @@ const SettingsPage = ({ formData, onChange, user }) => {
 
                                         {/* Left Side: Instance Data */}
                                         <div className="flex-1 p-6 md:p-8 space-y-6">
-                                            <h4 className="font-bold text-xl text-white">Dados da instância</h4>
-
                                             <div className="space-y-5">
-                                                <div>
-                                                    <p className="text-slate-400 text-xs font-semibold mb-1">Server URL:</p>
-                                                    <p className="font-mono text-sm text-sky-400 truncate hover:text-sky-300 transition-colors select-all">
-                                                        {formData.serverUrl || 'https://api.gateway.com'}
-                                                    </p>
-                                                </div>
-
-                                                <div>
-                                                    <p className="text-slate-400 text-xs font-semibold mb-1">Instance Token:</p>
-                                                    <p className="font-mono text-sm text-white/90 truncate select-all">
-                                                        {formData.instanceToken || '••••••••••••••••••••'}
-                                                    </p>
-                                                </div>
 
                                                 <div>
                                                     <p className="text-slate-400 text-xs font-semibold mb-1">Número conectado:</p>
