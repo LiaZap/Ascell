@@ -212,23 +212,33 @@ const SettingsPage = ({ formData, onChange, user }) => {
         if (formData.instanceStatus === 'connected') {
             const check = async () => {
                 try {
-                    const data = await api.getConnectionStatus();
+                    const rawData = await api.getConnectionStatus();
+
+                    // Handle broken/empty response
+                    if (!rawData || (rawData.status === 'disconnected' && !rawData.instance)) {
+                        setRealStatus('disconnected');
+                        return;
+                    }
+
+                    // Handle n8n Array Response
+                    const data = Array.isArray(rawData) ? rawData[0] : rawData;
 
                     // Robust check (Matches performConnectionCheck logic)
                     const isConnected = data && (
                         (data.instance && (data.instance.status === 'open' || data.instance.status === 'connected')) ||
-                        (data.status === 'connected') ||
+                        (data.status && (data.status === 'connected' || data.status.connected === true)) ||
                         (data.connected === true)
                     );
 
                     if (isConnected) {
                         setRealStatus('open');
                     } else {
-                        // Only flip to disconnected if we actually got a response that wasn't success
-                        if (data) setRealStatus('disconnected');
+                        // If we got data but it's not connected, it's definitively disconnected
+                        setRealStatus('disconnected');
                     }
                 } catch (e) {
                     console.warn('Status poll failed', e);
+                    setRealStatus('disconnected');
                 }
             };
             check();
