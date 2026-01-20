@@ -97,6 +97,7 @@ const DashboardForm = ({ formData, onChange, onGenerateProtocol }) => {
                 protocolCode: formData.protocolCode,
                 messageType: formData.messageType,
                 meetingLink: finalLink, // Explicit link field for n8n to use
+                linkPreview: true, // Enable link preview in Evolution API
 
                 // Fields for button structure
                 ...(formData.linkFormat === 'button' && {
