@@ -456,11 +456,37 @@ const SettingsPage = ({ formData, onChange, user }) => {
                                 </p>
                             </div>
 
+                            {/* Action Button Block Toggle */}
+                            <div className="space-y-2 border-t border-gray-100 pt-4 mt-4">
+                                <div className="p-4 bg-amber-50 border border-amber-100 rounded-lg flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center text-amber-600">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+                                        </div>
+                                        <div>
+                                            <h4 className="text-sm font-bold text-amber-800">Bloquear Botão de Ação</h4>
+                                            <p className="text-xs text-amber-600/80">Força o uso de "Link no Texto" para todos os usuários</p>
+                                        </div>
+                                    </div>
+                                    <label className="relative inline-flex items-center cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            className="sr-only peer"
+                                            checked={formData.actionButtonDisabled || false}
+                                            onChange={(e) => onChange('actionButtonDisabled', e.target.checked)}
+                                        />
+                                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-amber-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
+                                    </label>
+                                </div>
+                            </div>
+
                             <div className="pt-4 flex justify-end">
                                 <button
                                     className="w-full flex items-center justify-center gap-2 bg-blue-800 hover:bg-blue-900 text-white py-3 rounded-lg font-medium transition-colors shadow-sm mt-4"
                                     onClick={async () => {
-                                        const success = await handleSaveSettings();
+                                        const success = await handleSaveSettings({
+                                            actionButtonDisabled: formData.actionButtonDisabled
+                                        });
                                         if (success) alert('Configurações salvas com sucesso!');
                                     }}
                                 >

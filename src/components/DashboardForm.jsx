@@ -24,6 +24,13 @@ const DashboardForm = ({ formData, onChange, onGenerateProtocol }) => {
         }
     }, [formData.messageType]);
 
+    // Force link format to 'text' when action button is disabled by admin
+    useEffect(() => {
+        if (formData.actionButtonDisabled && formData.linkFormat === 'button') {
+            onChange('linkFormat', 'text');
+        }
+    }, [formData.actionButtonDisabled]);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -316,17 +323,29 @@ const DashboardForm = ({ formData, onChange, onGenerateProtocol }) => {
                     {/* Link Format Selection (Moved here to be available for both types) */}
                     <div className="mb-6 space-y-2">
                         <label className="block text-sm font-medium text-gray-700">Formato do Link</label>
+                        {formData.actionButtonDisabled && (
+                            <div className="mb-2 p-2 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-700 flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+                                Botão de Ação bloqueado pelo administrador
+                            </div>
+                        )}
                         <div className="flex p-1 bg-gray-100 rounded-lg w-full md:w-fit">
                             <button
                                 type="button"
-                                className={`px-4 py-1.5 text-xs font-medium rounded-md transition-all flex items-center gap-2 ${formData.linkFormat === 'button' ? 'bg-white text-primary shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
-                                onClick={() => onChange('linkFormat', 'button')}
+                                disabled={formData.actionButtonDisabled}
+                                className={`px-4 py-1.5 text-xs font-medium rounded-md transition-all flex items-center gap-2 ${formData.actionButtonDisabled
+                                    ? 'text-gray-400 cursor-not-allowed opacity-50'
+                                    : formData.linkFormat === 'button'
+                                        ? 'bg-white text-primary shadow-sm'
+                                        : 'text-gray-500 hover:text-gray-700'
+                                    }`}
+                                onClick={() => !formData.actionButtonDisabled && onChange('linkFormat', 'button')}
                             >
                                 Botão de Ação
                             </button>
                             <button
                                 type="button"
-                                className={`px-4 py-1.5 text-xs font-medium rounded-md transition-all flex items-center gap-2 ${formData.linkFormat !== 'button' ? 'bg-white text-primary shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                                className={`px-4 py-1.5 text-xs font-medium rounded-md transition-all flex items-center gap-2 ${(formData.linkFormat !== 'button' || formData.actionButtonDisabled) ? 'bg-white text-primary shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
                                 onClick={() => onChange('linkFormat', 'text')}
                             >
                                 Link no Texto

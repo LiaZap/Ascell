@@ -53,7 +53,8 @@ const INITIAL_FORM_STATE = {
   instancePhone: localStorage.getItem('instancePhone') || '',
   instanceStatus: localStorage.getItem('instanceStatus') || 'disconnected',
   serverUrl: localStorage.getItem('serverUrl') || '',
-  instanceToken: localStorage.getItem('instanceToken') || ''
+  instanceToken: localStorage.getItem('instanceToken') || '',
+  actionButtonDisabled: localStorage.getItem('actionButtonDisabled') === 'true'
 };
 
 const generateProtocol = () => {
@@ -70,6 +71,7 @@ function App() {
     const savedToken = localStorage.getItem('instanceToken') || '';
     const savedPhone = localStorage.getItem('instancePhone') || '';
     const savedStatus = localStorage.getItem('instanceStatus') || 'disconnected';
+    const savedActionButtonDisabled = localStorage.getItem('actionButtonDisabled') === 'true';
 
     return {
       ...INITIAL_FORM_STATE,
@@ -78,7 +80,8 @@ function App() {
       serverUrl: savedServerUrl,
       instanceToken: savedToken,
       instancePhone: savedPhone,
-      instanceStatus: savedStatus
+      instanceStatus: savedStatus,
+      actionButtonDisabled: savedActionButtonDisabled
     };
   });
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -124,7 +127,8 @@ function App() {
               instancePhone: settings.instancePhone || prev.instancePhone,
               instanceStatus: settings.instanceStatus || prev.instanceStatus,
               serverUrl: settings.serverUrl || prev.serverUrl,
-              instanceToken: settings.instanceToken || prev.instanceToken
+              instanceToken: settings.instanceToken || prev.instanceToken,
+              actionButtonDisabled: settings.actionButtonDisabled ?? prev.actionButtonDisabled
             }));
 
             // Persist to local storage immediately to sync state
@@ -134,6 +138,7 @@ function App() {
             if (settings.instanceStatus) localStorage.setItem('instanceStatus', settings.instanceStatus);
             if (settings.serverUrl) localStorage.setItem('serverUrl', settings.serverUrl);
             if (settings.instanceToken) localStorage.setItem('instanceToken', settings.instanceToken);
+            localStorage.setItem('actionButtonDisabled', String(settings.actionButtonDisabled ?? false));
           }
         } catch (err) {
           console.error('Failed to load global settings', err);
