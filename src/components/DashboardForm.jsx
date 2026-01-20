@@ -171,13 +171,20 @@ const DashboardForm = ({ formData, onChange, onGenerateProtocol }) => {
                         <p className="text-sm text-gray-400 mt-1 ml-[52px]">Personalize as mensagens e configurações de envio.</p>
                     </div>
 
-                    {/* Protocol Badge - Premium */}
-                    <div className="flex items-center gap-2 bg-gradient-to-r from-gray-900 to-gray-800 text-white px-4 py-2.5 rounded-xl shadow-lg">
+                    {/* Protocol Badge - Premium (Editable) */}
+                    <div className="flex items-center gap-2 bg-gradient-to-r from-gray-900 to-gray-800 text-white px-3 py-2 rounded-xl shadow-lg">
                         <span className="text-[10px] uppercase tracking-wider text-gray-400">Protocolo:</span>
-                        <span className="font-bold text-sm tracking-wide">{formData.protocolCode}</span>
+                        <input
+                            type="text"
+                            value={formData.protocolCode}
+                            onChange={(e) => onChange('protocolCode', e.target.value)}
+                            className="bg-transparent border-none outline-none font-bold text-sm tracking-wide text-white w-24 text-center placeholder-gray-500 focus:ring-1 focus:ring-white/20 rounded px-1"
+                            placeholder="ASC-0000"
+                            title="Clique para editar o protocolo"
+                        />
                         <button
                             onClick={onGenerateProtocol}
-                            className="ml-1 p-1.5 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white transition-colors"
+                            className="p-1.5 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white transition-colors"
                             title="Gerar novo protocolo"
                             type="button"
                         >
