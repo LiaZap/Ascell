@@ -1,4 +1,4 @@
-import { Calendar, Clock, Link as LinkIcon, User, Settings, HelpCircle, FileText, CheckCircle, Video, Shield, Loader2, AlertCircle, XCircle, RefreshCcw } from 'lucide-react';
+﻿import { Calendar, Clock, Link as LinkIcon, User, Settings, HelpCircle, FileText, CheckCircle, Video, Shield, Loader2, AlertCircle, XCircle, RefreshCcw } from 'lucide-react';
 import { MEETING_TEMPLATES, CERTIFICATE_TEMPLATES } from '../data/templates';
 import { useState, useEffect } from 'react';
 import { api } from '../services/api';
@@ -76,7 +76,7 @@ const DashboardForm = ({ formData, onChange, onGenerateProtocol }) => {
             if (formData.linkFormat === 'button') {
                 processedMessage = processedMessage.replace(/{{\s*link\s*}}/gi, '\n👉 *Clique no botão abaixo para acessar*');
             } else {
-                processedMessage = processedMessage.replace(/{{\s*link\s*}}/gi, finalLink);
+                processedMessage = processedMessage.replace(/\{\{\s*link\s*\}\}/gi, finalLink);
             }
 
             console.log('Final Processed Message:', processedMessage);
@@ -96,6 +96,7 @@ const DashboardForm = ({ formData, onChange, onGenerateProtocol }) => {
                 customMessage: processedMessage, // Ensure this matches text
                 protocolCode: formData.protocolCode,
                 messageType: formData.messageType,
+                meetingLink: finalLink, // Explicit link field for n8n to use
 
                 // Fields for button structure
                 ...(formData.linkFormat === 'button' && {
@@ -485,3 +486,4 @@ const DashboardForm = ({ formData, onChange, onGenerateProtocol }) => {
 };
 
 export default DashboardForm;
+
