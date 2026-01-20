@@ -116,7 +116,7 @@ const DashboardForm = ({ formData, onChange, onGenerateProtocol }) => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(payload, null, 2), // Pretty print to match user preference
+                body: JSON.stringify(payload), // Compact JSON to preserve line breaks correctly
             });
 
             if (response.ok) {
