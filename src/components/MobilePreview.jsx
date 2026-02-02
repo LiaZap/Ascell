@@ -22,6 +22,30 @@ const MobilePreview = ({ formData }) => {
     const processTemplate = (text) => {
         let processed = text;
 
+        // Calculate dynamic date
+        const getDynamicDate = () => {
+            const selectedDate = formData.meetingDate || formData.certificateDate;
+            if (!selectedDate) return 'hoje';
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const selected = new Date(selectedDate + 'T00:00:00');
+            if (selected.getTime() === today.getTime()) {
+                return 'hoje';
+            }
+            const weekDays = ['domingo', 'segunda-feira', 'terça-feira', 'quarta-feira', 'quinta-feira', 'sexta-feira', 'sábado'];
+            return weekDays[selected.getDay()];
+        };
+
+        // A1 Warning message
+        const a1Warning = formData.certificateType === 'a1' 
+            ? '\n⚠️ *ATENÇÃO:* O Certificado A1 deve ser baixado e instalado no computador para funcionamento correto.'
+            : '';
+
+        // Feedback section
+        const feedbackSection = formData.includeFeedback
+            ? '\n\n💬 Conte pra gente como foi a sua experiência — seu feedback é muito importante:\nhttps://g.page/r/CYSCaZIIfVS7EB0/review'
+            : '';
+
         // Handle Link Format
         if (formData.linkFormat === 'button') {
             // If button mode, remove the raw link from text and add a call-to-action
@@ -35,6 +59,14 @@ const MobilePreview = ({ formData }) => {
         processed = processed.replace(/{{protocol}}/g, formData.protocolCode);
         processed = processed.replace(/{{agentName}}/g, formData.agentName || 'Atendente');
         processed = processed.replace(/{{clientName}}/g, formData.clientName || 'Cliente');
+        processed = processed.replace(/{{dynamicDate}}/g, getDynamicDate());
+        processed = processed.replace(/{{emissionCode}}/g, formData.emissionCode || '---');
+        processed = processed.replace(/{{a1Warning}}/g, a1Warning);
+        processed = processed.replace(/{{feedbackSection}}/g, feedbackSection);
+        
+        // Clean up empty lines from empty variables
+        processed = processed.replace(/\n{3,}/g, '\n\n');
+        
         processed = processed.replace(/\*(.*?)\*/g, '<strong>$1</strong>');
         processed = processed.replace(/_(.*?)_/g, '<em>$1</em>');
         processed = processed.replace(/~(.*?)~/g, '<del>$1</del>');

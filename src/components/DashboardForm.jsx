@@ -66,11 +66,39 @@ const DashboardForm = ({ formData, onChange, onGenerateProtocol }) => {
             let processedMessage = messageText || '';
             console.log('Original Message for Interpolation:', processedMessage);
 
+            // Calculate dynamic date
+            const getDynamicDate = () => {
+                const selectedDate = formData.meetingDate || formData.certificateDate;
+                if (!selectedDate) return 'hoje';
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const selected = new Date(selectedDate + 'T00:00:00');
+                if (selected.getTime() === today.getTime()) {
+                    return 'hoje';
+                }
+                const weekDays = ['domingo', 'segunda-feira', 'terça-feira', 'quarta-feira', 'quinta-feira', 'sexta-feira', 'sábado'];
+                return weekDays[selected.getDay()];
+            };
+
+            // A1 Warning message
+            const a1Warning = formData.certificateType === 'a1' 
+                ? '\n⚠️ *ATENÇÃO:* O Certificado A1 deve ser baixado e instalado no computador para funcionamento correto.'
+                : '';
+
+            // Feedback section
+            const feedbackSection = formData.includeFeedback
+                ? '\n\n💬 Conte pra gente como foi a sua experiência — seu feedback é muito importante:\nhttps://g.page/r/CYSCaZIIfVS7EB0/review'
+                : '';
+
             // Use regex with whitespace support {{\s*key\s*}}
             processedMessage = processedMessage.replace(/{{\s*time\s*}}/gi, formData.meetingTime || '--:--');
             processedMessage = processedMessage.replace(/{{\s*protocol\s*}}/gi, formData.protocolCode);
             processedMessage = processedMessage.replace(/{{\s*agentName\s*}}/gi, formData.agentName || 'Atendente');
             processedMessage = processedMessage.replace(/{{\s*clientName\s*}}/gi, formData.clientName || 'Cliente');
+            processedMessage = processedMessage.replace(/{{\s*dynamicDate\s*}}/gi, getDynamicDate());
+            processedMessage = processedMessage.replace(/{{\s*emissionCode\s*}}/gi, formData.emissionCode || '');
+            processedMessage = processedMessage.replace(/{{\s*a1Warning\s*}}/gi, a1Warning);
+            processedMessage = processedMessage.replace(/{{\s*feedbackSection\s*}}/gi, feedbackSection);
 
             // 4. Handle Link & Format
             if (formData.linkFormat === 'button') {
@@ -78,6 +106,9 @@ const DashboardForm = ({ formData, onChange, onGenerateProtocol }) => {
             } else {
                 processedMessage = processedMessage.replace(/\{\{\s*link\s*\}\}/gi, finalLink);
             }
+
+            // Clean up empty lines from empty variables
+            processedMessage = processedMessage.replace(/\n{3,}/g, '\n\n');
 
             console.log('Final Processed Message:', processedMessage);
 
@@ -318,6 +349,83 @@ const DashboardForm = ({ formData, onChange, onGenerateProtocol }) => {
                                     onChange={(e) => onChange('manualLink', e.target.value)}
                                     required
                                 />
+                            </div>
+                        </div>
+                    </section>
+                )}
+
+                {/* Section 2B: Certificate Info */}
+                {formData.messageType === 'certificate' && (
+                    <section className="animate-in fade-in slide-in-from-top-4 duration-300">
+                        <div className="flex items-center justify-between mb-5">
+                            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-2">
+                                <CheckCircle size={14} /> Dados do Certificado
+                            </h3>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            {/* Tipo de Certificado */}
+                            <div className="space-y-1.5">
+                                <label className="block text-sm font-medium text-gray-700">Tipo de Certificado</label>
+                                <div className="flex p-1 bg-gray-100 rounded-lg">
+                                    <button
+                                        type="button"
+                                        className={`flex-1 px-4 py-2 text-xs font-medium rounded-md transition-all flex items-center justify-center gap-2 ${formData.certificateType === 'a1' ? 'bg-white text-primary shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                                        onClick={() => onChange('certificateType', 'a1')}
+                                    >
+                                        🔐 Certificado A1
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className={`flex-1 px-4 py-2 text-xs font-medium rounded-md transition-all flex items-center justify-center gap-2 ${formData.certificateType !== 'a1' ? 'bg-white text-primary shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                                        onClick={() => onChange('certificateType', 'standard')}
+                                    >
+                                        📄 Certificado Padrão
+                                    </button>
+                                </div>
+                                {formData.certificateType === 'a1' && (
+                                    <p className="text-xs text-amber-600 mt-1 flex items-center gap-1">
+                                        <AlertCircle size={12} /> Mensagem de atenção sobre instalação será incluída
+                                    </p>
+                                )}
+                            </div>
+
+                            {/* Código de Emissão */}
+                            <div className="space-y-1.5">
+                                <label className="block text-sm font-medium text-gray-700">Código de Emissão *</label>
+                                <input
+                                    type="text"
+                                    className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none text-sm"
+                                    placeholder="Ex: EMI-12345"
+                                    value={formData.emissionCode || ''}
+                                    onChange={(e) => onChange('emissionCode', e.target.value)}
+                                    required
+                                />
+                            </div>
+
+                            {/* Data do Atendimento */}
+                            <div className="space-y-1.5">
+                                <label className="block text-sm font-medium text-gray-700">Data do Atendimento</label>
+                                <input
+                                    type="date"
+                                    className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none text-sm"
+                                    value={formData.certificateDate || ''}
+                                    onChange={(e) => onChange('certificateDate', e.target.value)}
+                                />
+                            </div>
+
+                            {/* Checkbox de Feedback */}
+                            <div className="space-y-1.5">
+                                <label className="block text-sm font-medium text-gray-700">Incluir Feedback</label>
+                                <label className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-100 transition-colors">
+                                    <input
+                                        type="checkbox"
+                                        className="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary/20"
+                                        checked={formData.includeFeedback || false}
+                                        onChange={(e) => onChange('includeFeedback', e.target.checked)}
+                                    />
+                                    <span className="text-sm text-gray-700">Solicitar avaliação do cliente</span>
+                                </label>
                             </div>
                         </div>
                     </section>

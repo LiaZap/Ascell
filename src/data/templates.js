@@ -4,7 +4,7 @@ export const MEETING_TEMPLATES = [
         name: 'Versão 1 – Padrão',
         text: `Olá *{{clientName}}*, me chamo *{{agentName}}* da Videoconferência do Grupo ASCEL.
 
-📅 Atendimento: hoje às {{time}} (horário de Brasília)
+📅 Atendimento: {{dynamicDate}} às {{time}} (horário de Brasília)
 
 🔗 Link de acesso:
 {{link}}
@@ -13,7 +13,7 @@ export const MEETING_TEMPLATES = [
 
 📌 Importante:
 • Local silencioso
-• Fundo claro obrigatório
+• Fundo neutro obrigatório
 • Tolerância de atraso: 8 minutos
 
 Confirma nosso atendimento?`
@@ -23,7 +23,7 @@ Confirma nosso atendimento?`
         name: 'Versão 2 – Lista Numerada',
         text: `Olá *{{clientName}}*, aqui é *{{agentName}}* da equipe de Videoconferência do Grupo ASCEL 😊
 
-1️⃣ Atendimento marcado para hoje às {{time}} (horário de Brasília)
+1️⃣ Atendimento marcado para {{dynamicDate}} às {{time}} (horário de Brasília)
 
 2️⃣ Para acessar a reunião:
 {{link}}
@@ -32,7 +32,7 @@ Confirma nosso atendimento?`
 
 3️⃣ Antes do atendimento, atenção:
 ✔ Local silencioso
-✔ Fundo claro obrigatório
+✔ Fundo neutro obrigatório
 ✔ Tolerância de atraso: 8 minutos
 
 Podemos confirmar sua presença?`
@@ -42,7 +42,7 @@ Podemos confirmar sua presença?`
         name: 'Versão 3 – Compacto',
         text: `Olá *{{clientName}}*, me chamo *{{agentName}}* da Videoconferência do Grupo ASCEL.
 
-📅 Atendimento: hoje às {{time}} (horário de Brasília)
+📅 Atendimento: {{dynamicDate}} às {{time}} (horário de Brasília)
 
 🔗 Link de acesso:
 {{link}}
@@ -51,7 +51,7 @@ Podemos confirmar sua presença?`
 
 📌 Importante:
 • Local silencioso
-• Fundo claro obrigatório
+• Fundo neutro obrigatório
 • Tolerância de atraso: 8 minutos
 
 Confirma nosso atendimento?`
@@ -63,7 +63,7 @@ Confirma nosso atendimento?`
 
 ────────────
 📅 *Horário do atendimento*
-Hoje às {{time}} (horário de Brasília)
+{{dynamicDate}} às {{time}} (horário de Brasília)
 ────────────
 
 🔗 *Link da reunião*
@@ -73,7 +73,7 @@ Hoje às {{time}} (horário de Brasília)
 
 📌 *Orientações*
 • Ambiente silencioso
-• Fundo claro (parede lisa)
+• Fundo neutro (parede lisa)
 • Tolerância de atraso: 8 minutos
 
 Podemos confirmar?`
@@ -84,7 +84,7 @@ Podemos confirmar?`
         text: `Olá *{{clientName}}*, sou *{{agentName}}* e serei responsável por realizar a sua Videoconferência.
 
 ❓ *Quando é o atendimento?*
-📅 Hoje às {{time}} (horário de Brasília)
+📅 {{dynamicDate}} às {{time}} (horário de Brasília)
 
 ❓ *Como acessar?*
 🔗 {{link}}
@@ -93,7 +93,7 @@ Podemos confirmar?`
 
 ❗ *Atenção:*
 • Local silencioso
-• Fundo claro obrigatório
+• Fundo neutro obrigatório
 • Tolerância de atraso: 8 minutos
 
 Podemos confirmar o atendimento?`
@@ -104,7 +104,7 @@ Podemos confirmar o atendimento?`
         text: `Olá *{{clientName}}*, sou *{{agentName}}* agente de vídeo conferência responsável pelo seu atendimento.
 
 📞 *Videoconferência | Grupo ASCEL*
-🕒 Hoje às {{time}} (horário de Brasília)
+🕒 {{dynamicDate}} às {{time}} (horário de Brasília)
 
 🔗 *Acesso*
 {{link}}
@@ -114,7 +114,7 @@ Podemos confirmar o atendimento?`
 
 📌 *Para um atendimento tranquilo:*
 ✔ Local silencioso
-✔ Fundo claro (parede lisa)
+✔ Fundo neutro (parede lisa)
 ✔ Atraso permitido: até 8 minutos
 
 Confirma o atendimento?`
@@ -124,7 +124,7 @@ Confirma o atendimento?`
         name: 'Versão 7 – Direto',
         text: `Olá *{{clientName}}*, meu nome é *{{agentName}}*, sou da equipe de Videoconferência do Grupo ASCEL.
 
-📅 Atendimento agendado para hoje às {{time}} (horário de Brasília).
+📅 Atendimento agendado para {{dynamicDate}} às {{time}} (horário de Brasília).
 
 🔗 Acesse pelo link:
 {{link}}
@@ -133,7 +133,7 @@ Confirma o atendimento?`
 
 📌 Requisitos:
 • Local silencioso
-• Fundo claro obrigatório
+• Fundo neutro obrigatório
 • Tolerância de atraso: 8 minutos
 
 Podemos confirmar?`
@@ -143,7 +143,7 @@ Podemos confirmar?`
         name: 'Versão 8 – Destaque',
         text: `Olá *{{clientName}}*, aqui é *{{agentName}}* da equipe de Videoconferência do Grupo ASCEL.
 
-⭐ *Atendimento de hoje*
+⭐ *Atendimento de {{dynamicDate}}*
 🕒 {{time}} (horário de Brasília)
 
 🔗 *Link da reunião*
@@ -154,7 +154,7 @@ Podemos confirmar?`
 
 📌 *Atenção*
 • Ambiente silencioso
-• Fundo claro (parede lisa) obrigatório
+• Fundo neutro (parede lisa) obrigatório
 • Tolerância de atraso: 8 minutos
 
 Podemos confirmar nosso atendimento?`
@@ -167,15 +167,15 @@ export const CERTIFICATE_TEMPLATES = [
         name: 'Modelo 1 – Padrão',
         text: `🎉 *PARABÉNS *{{clientName}}*!*
 Seu certificado foi APROVADO ✅
-
-⚠️ *Atenção:*
-Este certificado só pode ser baixado e instalado no computador.
+{{a1Warning}}
 
 🔗 Link para emissão do certificado:
 {{link}}
 
-📄 Protocolo:
-{{protocol}}
+📄 Protocolo: {{protocol}}
+
+🔑 Código de Emissão: {{emissionCode}}
+{{feedbackSection}}
 
 Agradecemos a confiança 🚀
 *{{agentName}}* - Grupo ASCEL`
@@ -186,15 +186,15 @@ Agradecemos a confiança 🚀
         text: `✅ Certificado aprovado com sucesso!
 
 Olá *{{clientName}}*,
-
-⚠️ *Importante:*
-O download/instalação deve ser feito somente no computador.
+{{a1Warning}}
 
 ➡️ Emissão do certificado:
 {{link}}
 
-➡️ Protocolo:
-{{protocol}}
+➡️ Protocolo: {{protocol}}
+
+🔑 Código de Emissão: {{emissionCode}}
+{{feedbackSection}}
 
 Obrigado pela confiança 🚀
 Att, *{{agentName}}*`
@@ -203,18 +203,18 @@ Att, *{{agentName}}*`
         id: 'c3',
         name: 'Modelo 3 – Visual',
         text: `🎉 Parabéns *{{clientName}}*! Seu certificado foi aprovado ✅
-
-💻 *Atenção:*
-O certificado pode ser baixado e instalado apenas no computador.
+{{a1Warning}}
 
 🔗 Acesse para emitir:
 {{link}}
 
-📌 Protocolo:
-{{protocol}}
+📌 Protocolo: {{protocol}}
+
+🔑 Código de Emissão: {{emissionCode}}
+{{feedbackSection}}
 
 Agradecemos a confiança 🚀
-*{{agentName}}* | Suporte`
+*{{agentName}}*`
     },
     {
         id: 'c4',
@@ -223,15 +223,16 @@ Agradecemos a confiança 🚀
 
 ───────────────
 Olá *{{clientName}}*,
-
-⚠️ Download e instalação disponíveis somente em computador.
+{{a1Warning}}
 ───────────────
 
 🔗 Link de emissão:
 {{link}}
 
-📄 Protocolo:
-{{protocol}}
+📄 Protocolo: {{protocol}}
+
+🔑 Código de Emissão: {{emissionCode}}
+{{feedbackSection}}
 
 Obrigado por confiar em nosso serviço 🚀
 Atenciosamente, *{{agentName}}*`
@@ -240,15 +241,19 @@ Atenciosamente, *{{agentName}}*`
         id: 'c5',
         name: 'Modelo 5 – Passos',
         text: `🎉 Parabéns *{{clientName}}*! Seu certificado foi aprovado ✅
+{{a1Warning}}
 
 📌 *Como emitir:*
 1️⃣ Acesse o link abaixo
 2️⃣ Utilize o protocolo informado
-3️⃣ Faça o download pelo computador
+3️⃣ Use o código de emissão
 
 🔗 {{link}}
 
 📄 Protocolo: {{protocol}}
+
+🔑 Código de Emissão: {{emissionCode}}
+{{feedbackSection}}
 
 Agradecemos a confiança 🚀
 *{{agentName}}*`
@@ -259,15 +264,15 @@ Agradecemos a confiança 🚀
         text: `✅ Seu certificado foi aprovado com sucesso!
 
 Olá *{{clientName}}*,
-
-⚠️ *Atenção:*
-A emissão e instalação são permitidas somente em computador.
+{{a1Warning}}
 
 🔗 Link de acesso:
 {{link}}
 
-📌 Protocolo:
-{{protocol}}
+📌 Protocolo: {{protocol}}
+
+🔑 Código de Emissão: {{emissionCode}}
+{{feedbackSection}}
 
 Obrigado pela confiança 🚀
 Att, *{{agentName}}*`
@@ -279,15 +284,15 @@ Att, *{{agentName}}*`
 
 Temos uma ótima notícia:
 🎉 Seu certificado foi APROVADO ✅
-
-⚠️ *Lembrete importante:*
-O certificado só pode ser baixado/instalado no computador.
+{{a1Warning}}
 
 🔗 Emissão do certificado:
 {{link}}
 
-📄 Protocolo:
-{{protocol}}
+📄 Protocolo: {{protocol}}
+
+🔑 Código de Emissão: {{emissionCode}}
+{{feedbackSection}}
 
 Agradecemos a confiança 🚀
 Com carinho, *{{agentName}}*`
@@ -297,15 +302,15 @@ Com carinho, *{{agentName}}*`
         name: 'Modelo 8 – Destaque',
         text: `⭐ *PARABÉNS *{{clientName}}*!*
 Seu certificado foi APROVADO ✅
-
-💻 *Importante:*
-A emissão é válida apenas pelo computador.
+{{a1Warning}}
 
 🔗 Link de emissão:
 {{link}}
 
-📌 Protocolo:
-{{protocol}}
+📌 Protocolo: {{protocol}}
+
+🔑 Código de Emissão: {{emissionCode}}
+{{feedbackSection}}
 
 Obrigado pela confiança 🚀
 *{{agentName}}* - Atendimento`
