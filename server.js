@@ -226,7 +226,26 @@ app.get('/api/setup', async (req, res) => {
 // 1. Get Logs
 app.get('/api/logs', async (req, res) => {
     try {
-        const result = await pool.query('SELECT * FROM logs ORDER BY created_at DESC LIMIT 100');
+        const { startDate, endDate, limit } = req.query;
+        let query = 'SELECT * FROM logs';
+        const params = [];
+        
+        // Add date filtering if provided
+        if (startDate && endDate) {
+            query += ' WHERE date >= $1 AND date <= $2';
+            params.push(startDate, endDate);
+        } else if (startDate) {
+            query += ' WHERE date >= $1';
+            params.push(startDate);
+        }
+        
+        query += ' ORDER BY created_at DESC';
+        
+        // Use provided limit or default to 1000 for analytics
+        const maxLimit = Math.min(parseInt(limit) || 1000, 5000);
+        query += ` LIMIT ${maxLimit}`;
+        
+        const result = await pool.query(query, params);
         res.json(result.rows);
     } catch (err) {
         console.error('Error fetching logs:', err);
