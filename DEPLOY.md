@@ -38,6 +38,12 @@ Vá para a aba **Logs** (Build Logs e depois App Logs) para verificar se:
 
 ## Solução de Problemas Comuns
 
-- **Erro de Memória:** Se o build falhar, tente aumentar temporariamente a memória RAM alocada para o build, se possível.
-- **Váriaveis Faltando:** Se o app falhar ao iniciar, verifique se `DATABASE_URL` está correta.
-- **Porta:** Certifique-se de que a porta exposta no Easypanel é a 3000.
+- **Erro "Failed to clone repository"**:
+  1. **Verifique o Ramo (Branch)**: Certifique-se de que está usando `master` (nosso padrão) e não `main`.
+  2. **Repositório Privado**: Se o repo for privado, você precisa de um Token. Gere um em (GitHub Settings > Developer Settings > Personal access tokens) e use a URL: `https://SEU_TOKEN@github.com/LiaZap/Ascell.git`.
+
+- **404 Not Found (Frontend)**: Se o site abrir mas der erro ao navegar, verifique se o arquivo `nginx.conf` foi copiado corretamente (o Dockerfile.frontend faz isso).
+
+- **Erro de Conexão na API**: Se os dados não carregarem, abra o Console do navegador (F12) e veja se o frontend está tentando conectar na URL certa (`VITE_API_URL`).
+
+- **Erro de Memória:** Se o build falhar, tente aumentar temporariamente a memória RAM alocada para o build.
