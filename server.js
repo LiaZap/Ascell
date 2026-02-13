@@ -430,9 +430,9 @@ app.put('/api/settings', async (req, res) => {
     }
 });
 
-// Handle SPA Routing - Send all other requests to index.html
-app.get(/.*/, (req, res) => {
-    res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+// Basic root route
+app.get('/', (req, res) => {
+    res.send('API is running. Use /api routes.');
 });
 
 app.listen(port, () => {
