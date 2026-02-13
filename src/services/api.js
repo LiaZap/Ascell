@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.PROD ? '/api' : '/api'; // Relative path works for both if proxied or served static
+const API_URL = import.meta.env.VITE_API_URL || '/api';
 
 export const api = {
     // Auth
